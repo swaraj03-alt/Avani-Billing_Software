@@ -1,0 +1,236 @@
+    {% extends "base.html" %}
+    {% block title %}Sale / Billing{% endblock %}
+
+    {% block content %}
+    <style>
+        .billing-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        /* Form Section */
+        .entry-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        input {
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--brand-green); }
+
+        .btn-add {
+            grid-column: span 2;
+            background: var(--brand-green, #2e7d32);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:hover { opacity: 0.9; }
+
+        /* Invoice/Table Section */
+        .invoice-preview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .invoice-header {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            border-bottom: 2px dashed #e2e8f0;
+            text-align: center;
+        }
+
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .bill-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #64748b;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .bill-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .total-section {
+            margin-top: auto;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #1e293b;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: #4f46e5;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+
+    <div class="billing-container">
+        <div class="entry-card">
+            <h2 style="margin-top:0">Create New Bill</h2>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label>Customer Name</label>
+                    <input type="text" id="custName" placeholder="Search or enter name">
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Scan Product / Search Code</label>
+                    <input type="text" id="prodName" placeholder="Barcode Scanner Input">
+                </div>
+
+                <div class="input-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="prodPrice" placeholder="0.00">
+                </div>
+
+                <div class="input-group">
+                    <label>Quantity</label>
+                    <input type="number" id="prodQty" value="1">
+                </div>
+
+                <button class="btn-add" onclick="addItem()">+ Add to Bill</button>
+            </div>
+        </div>
+
+        <div class="invoice-preview">
+            <div class="invoice-header">
+                <h3 style="margin:0">Avani Wood Pressed Oil</h3>
+                <small>Live Bill Preview</small>
+            </div>
+
+            <table class="bill-table" id="billItems">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Grand Total:</span>
+                    <span id="grandTotal">₹ 0.00</span>
+                </div>
+            <button class="btn-generate" onclick="openPaymentModal()">Proceed to Payment</button>            </div>
+        </div>
+    </div>
+
+    <script>
+        let total = 0;
+
+        function addItem() {
+            const name = document.getElementById('prodName').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const qty = parseInt(document.getElementById('prodQty').value);
+
+            if(!name || !price) return alert("Please fill product details");
+
+            const subtotal = price * qty;
+            total += subtotal;
+
+            const table = document.getElementById('billItems').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+
+            newRow.innerHTML = `
+                <td>${name}</td>
+                <td>${qty}</td>
+                <td>₹ ${subtotal.toFixed(2)}</td>
+            `;
+
+            document.getElementById('grandTotal').innerText = `₹ ${total.toFixed(2)}`;
+
+            // Clear inputs for next item
+            document.getElementById('prodName').value = "";
+            document.getElementById('prodPrice').value = "";
+            document.getElementById('prodQty').value = "1";
+            document.getElementById('prodName').focus();
+        }
+        function openPaymentModal() {
+    const customer = document.getElementById('custName').value;
+
+    if (total <= 0) {
+        return alert("Please add at least one product.");
+    }
+    if (!customer) {
+        return alert("Please enter Customer Name.");
+    }
+
+    // Redirect to the payment page with URL parameters
+    // This sends the name and total to your Flask backend
+    window.location.href = `/payments?customer=${encodeURIComponent(customer)}&total=${total.toFixed(2)}`;
+}
+    </script>
+
+    {% endblock %}
+

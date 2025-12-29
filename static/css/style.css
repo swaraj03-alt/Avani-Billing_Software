@@ -1,0 +1,224 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background: #f4f6f9;
+}
+
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 240px;
+    background: #2c3e50;
+    padding: 20px;
+}
+
+.sidebar h2 {
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.sidebar a {
+    display: block;
+    color: #ecf0f1;
+    text-decoration: none;
+    padding: 10px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+}
+
+.sidebar a:hover {
+    background: #34495e;
+}
+
+.logout {
+    margin-top: 20px;
+    background: #c0392b;
+}
+
+/* MAIN */
+.content {
+    flex: 1;
+    padding: 25px;
+}
+
+/* CARDS */
+.cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* FORMS */
+form input, form select, form button {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+}
+
+button {
+    background: #27ae60;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.quotation-box {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+}
+
+.q-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.q-title {
+    text-align: right;
+}
+
+.q-address {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.q-address input {
+    width: 100%;
+    margin-bottom: 6px;
+}
+
+.q-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.q-table th, .q-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+.q-table th {
+    background: #2c3e50;
+    color: white;
+}
+
+.q-table input {
+    width: 100%;
+    border: none;
+    text-align: center;
+}
+
+.q-totals {
+    width: 40%;
+    float: right;
+    margin-top: 20px;
+}
+
+.q-totals td {
+    border: 1px solid #ccc;
+    padding: 8px;
+}
+
+.grand {
+    font-weight: bold;
+    background: #ecf0f1;
+}
+
+.q-actions {
+    margin-top: 30px;
+}
+
+.q-actions button {
+    padding: 10px 20px;
+    margin-right: 10px;
+}
+
+.convert {
+    background: #2980b9;
+    color: white;
+}
+
+.q-sign {
+    margin-top: 80px;
+    text-align: right;
+}
+
+@media print {
+    button, input {
+        display: none;
+    }
+}
+.company {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    margin-right: 15px;
+}
+
+.add-btn {
+    margin-top: 15px;
+    padding: 10px 15px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+.whatsapp {
+    background: #25D366;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+
+.no-print {
+    margin-top: 20px;
+}
+
+@media print {
+    .sidebar,
+    .no-print,
+    button {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+
+    .print-area {
+        box-shadow: none;
+        border: none;
+    }
+
+    input {
+        border: none;
+        outline: none;
+    }
+}

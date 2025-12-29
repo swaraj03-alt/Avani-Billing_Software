@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avani Admin Login</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;700;800&display=swap');
+
+        :root {
+            --brand-green: #2e7d32;
+            --deep-purple: #4c3aff;
+            --orange-cta: #f97316;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Large Header for Logo Visibility */
+        .navbar {
+            background: white;
+            padding: 20px 8%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        /* Logo Branding Section */
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .main-logo {
+            height: 80px; /* Significantly larger logo */
+            width: auto;
+            filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .main-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .brand-text-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--brand-green);
+            line-height: 1;
+        }
+
+        .brand-tagline {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748b;
+            margin-top: 5px;
+            font-weight: 700;
+        }
+
+        /* Layout Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            padding: 60px 10%;
+            gap: 40px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .hero-message h1 {
+            color: white;
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 25px;
+        }
+
+        .feature-item {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Modern Login Card */
+        .login-card {
+            background: white;
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+            max-width: 420px;
+            margin-left: auto;
+        }
+
+        .login-card h2 {
+            font-size: 1.8rem;
+            color: #1e293b;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--deep-purple);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 18px;
+            background: var(--orange-cta);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            background: #ea580c;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(249, 115, 22, 0.4);
+        }
+
+        @media (max-width: 992px) {
+            .content-grid { grid-template-columns: 1fr; text-align: center; }
+            .login-card { margin: 0 auto; }
+            .navbar { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand-block">
+            <img src="static/images/avani-logo.jpg" alt="Avani Logo" class="main-logo">
+            <div class="brand-text-container">
+                <span class="brand-name">Avani</span>
+                <span class="brand-tagline">Wood Cold Pressed Oil</span>
+            </div>
+        </div>
+     </nav>
+
+    <div class="content-grid">
+        <div class="hero-message">
+            <h1>India's #1 Billing Software for Oil Mills</h1>
+            <div class="feature-item">✅ Create GST Bills in 8 Seconds</div>
+            <div class="feature-item">✅ Manage Inventory & Stock</div>
+            <div class="feature-item">✅ 100% Secure Data Encrypted</div>
+        </div>
+
+        <div class="login-card">
+            <h2>Welcome Back</h2>
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username / Email" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <button type="submit" class="login-btn">Secure Login →</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

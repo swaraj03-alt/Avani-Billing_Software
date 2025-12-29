@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% block title %}Complete Payment{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --brand-primary: #4f46e5;
+        --brand-success: #2e7d32;
+        --bg-light: #f8fafc;
+    }
+
+    .payment-wrapper {
+        max-width: 900px;
+        margin: 40px auto;
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 20px;
+    }
+
+    .payment-card {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+    }
+
+    .payment-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .pay-mode-btn {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .pay-mode-btn:hover {
+        border-color: var(--brand-primary);
+        background: #f0f7ff;
+    }
+
+    .pay-mode-btn.active {
+        border-color: var(--brand-primary);
+        background: #f0f7ff;
+        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    .pay-mode-btn i {
+        font-size: 2rem;
+        display: block;
+        margin-bottom: 10px;
+    }
+
+    .summary-card {
+        background: #1e293b;
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        height: fit-content;
+    }
+
+    #qr-container {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        padding: 20px;
+        background: #f1f5f9;
+        border-radius: 10px;
+    }
+
+    .qr-img {
+        width: 180px;
+        height: 180px;
+        background: white;
+        padding: 10px;
+        border-radius: 8px;
+    }
+
+    .btn-finish {
+        width: 100%;
+        background: var(--brand-success);
+        color: white;
+        border: none;
+        padding: 18px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 20px;
+    }
+
+    .btn-finish:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+    }
+</style>
+
+<div class="payment-wrapper">
+    <div class="payment-card">
+        <h2 style="margin-top:0">Select Payment Method</h2>
+        <p class="text-muted">How would the customer like to pay?</p>
+
+        <div class="payment-grid">
+            <div class="pay-mode-btn" onclick="setMode('Cash', this)">
+                <i>💵</i>
+                <strong>Cash</strong>
+            </div>
+            <div class="pay-mode-btn" onclick="setMode('UPI', this)">
+                <i>📱</i>
+                <strong>UPI / QR Scan</strong>
+            </div>
+            <div class="pay-mode-btn" onclick="setMode('Card', this)">
+                <i>💳</i>
+                <strong>Card</strong>
+            </div>
+            <div class="pay-mode-btn" onclick="setMode('Credit', this)">
+                <i>🤝</i>
+                <strong>Customer Credit</strong>
+            </div>
+        </div>
+
+        <div id="qr-container">
+            <h4 style="margin-top:0">Scan to Pay</h4>
+            <img src="" id="upi-qr" class="qr-img" alt="UPI QR Code">
+            <p style="margin-top:10px; font-size: 0.9rem; color: #475569;">
+                Amount: <strong id="qr-amt">₹ 0.00</strong><br>
+                VPA: avani.oils@okicici
+            </p>
+        </div>
+
+        <div id="ref-section" style="display:none; margin-top: 20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:600;">Transaction Ref No.</label>
+            <input type="text" id="refNo" style="width:100%; padding:12px; border:1px solid #ddd; border-radius:8px;" placeholder="Enter UTR or Cheque Number">
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <h4 style="margin-top:0; color: #94a3b8;">Order Summary</h4>
+        <div style="margin-bottom: 20px;">
+            <small>Customer:</small>
+<span class="badge bg-light text-primary">Voucher: PAY-{{ voucher_no if voucher_no else '001' }}</span>        </div>
+        
+        <hr style="border: 0; border-top: 1px solid #334155;">
+        
+        <div style="display: flex; justify-content: space-between; margin: 20px 0;">
+            <span>Grand Total</span>
+            <span style="font-size: 1.5rem; font-weight: 800; color: #fbbf24;">₹ {{ total_amount }}</span>
+        </div>
+
+        <button class="btn-finish" id="finishBtn" disabled onclick="processPayment()">
+            Confirm & Print Receipt
+        </button>
+        
+        <a href="/billing" style="display:block; text-align:center; color:#94a3b8; margin-top:15px; text-decoration:none; font-size:0.9rem;">← Back to Items</a>
+    </div>
+</div>
+
+<script>
+    let selectedMode = "";
+    const totalAmount = "{{ total_amount }}";
+
+    function setMode(mode, element) {
+        selectedMode = mode;
+        
+        // UI Updates
+        document.querySelectorAll('.pay-mode-btn').forEach(btn => btn.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('finishBtn').disabled = false;
+
+        // Logic for UPI QR
+        const qrContainer = document.getElementById('qr-container');
+        const refSection = document.getElementById('ref-section');
+
+        if(mode === 'UPI') {
+            qrContainer.style.display = 'block';
+            refSection.style.display = 'block';
+            // Generate UPI URL
+            const vpa = "avani.oils@okicici"; // Replace with your actual VPA
+            const name = "Avani_Oils";
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${vpa}%26pn=${name}%26am=${totalAmount}%26cu=INR`;
+            document.getElementById('upi-qr').src = qrUrl;
+            document.getElementById('qr-amt').innerText = "₹ " + totalAmount;
+        } else if (mode === 'Card' || mode === 'Credit') {
+            qrContainer.style.display = 'none';
+            refSection.style.display = 'block';
+        } else {
+            qrContainer.style.display = 'none';
+            refSection.style.display = 'none';
+        }
+    }
+
+    function processPayment() {
+    const refNo = document.getElementById('refNo').value;
+    const amount = "{{ total_amount }}";
+    const customer = "{{ customer_name }}";
+
+    // In a real app, you would save to database here via fetch/POST
+    alert("Payment Successful! Generating GST Invoice...");
+
+    // Final step: Redirect to a printable receipt page
+    window.location.href = `/generate-invoice?amt=${amount}&cust=${customer}&mode=${selectedMode}&ref=${refNo}`;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid py-4 bg-light min-vh-100">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-dark">
+            <i class="bi bi-gear-fill text-warning me-2"></i>
+            Production Entry
+        </h2>
+        <span class="badge bg-warning text-dark fs-6">
+            Date: {{ today }}
+        </span>
+    </div>
+
+    <form action="/save-production" method="POST">
+        <div class="row">
+
+            <!-- LEFT SIDE -->
+            <div class="col-lg-8">
+
+                <!-- Batch Info -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white fw-bold text-warning">
+                        <i class="bi bi-hash me-2"></i>Batch Information
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Batch No</label>
+                                <input class="form-control" name="batch_no" value="AUTO" readonly>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Production Date</label>
+                                <input type="date" class="form-control" name="production_date" required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Status</label>
+                                <select class="form-select" name="status">
+                                    <option>Completed</option>
+                                    <option>In Progress</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw Material Consumption -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white fw-bold text-warning">
+                        <i class="bi bi-box-seam me-2"></i>Raw Material Consumption
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle" id="raw_table">
+                            <thead class="table-light text-center">
+                                <tr>
+                                    <th>Raw Material</th>
+                                    <th>Qty Used (Kg)</th>
+                                    <th>Rate</th>
+                                    <th>Total Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input class="form-control" name="raw_material[]"></td>
+                                    <td><input type="number" class="form-control" name="raw_qty[]" value="0" onchange="calcProduction()"></td>
+                                    <td><input type="number" class="form-control" name="raw_rate[]" value="0" onchange="calcProduction()"></td>
+                                    <td class="fw-bold text-end raw-total">0.00</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Finished Goods -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white fw-bold text-warning">
+                        <i class="bi bi-droplet-fill me-2"></i>Finished Goods Output
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Finished Product</label>
+                                <input class="form-control" name="finished_product">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Quantity Produced (Kg/L)</label>
+                                <input type="number" class="form-control" name="finished_qty" onchange="calcProduction()">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="fw-semibold">Wastage (Kg)</label>
+                                <input class="form-control" name="wastage" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT SUMMARY -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+                    <div class="card-header bg-white fw-bold text-warning">
+                        <i class="bi bi-calculator-fill me-2"></i>Production Summary
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Raw Qty</span>
+                            <span id="raw_qty_total">0</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Total Raw Cost</span>
+                            <span id="raw_cost_total">0.00</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Finished Qty</span>
+                            <span id="finished_total">0</span>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Yield %</span>
+                            <span id="yield_percent">0%</span>
+                        </div>
+
+                        <hr>
+
+                        <button class="btn btn-warning btn-lg w-100">
+                            <i class="bi bi-save me-2"></i>Save Production
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+function calcProduction() {
+    let rawQtyTotal = 0;
+    let rawCostTotal = 0;
+
+    document.querySelectorAll('#raw_table tbody tr').forEach(row => {
+        let qty = +row.querySelector('[name="raw_qty[]"]').value;
+        let rate = +row.querySelector('[name="raw_rate[]"]').value;
+        let total = qty * rate;
+
+        rawQtyTotal += qty;
+        rawCostTotal += total;
+
+        row.querySelector('.raw-total').innerText = total.toFixed(2);
+    });
+
+    let finishedQty = +document.querySelector('[name="finished_qty"]').value || 0;
+    let wastage = rawQtyTotal - finishedQty;
+    let yieldPercent = rawQtyTotal > 0 ? (finishedQty / rawQtyTotal) * 100 : 0;
+
+    document.querySelector('[name="wastage"]').value = wastage.toFixed(2);
+
+    document.getElementById('raw_qty_total').innerText = rawQtyTotal.toFixed(2);
+    document.getElementById('raw_cost_total').innerText = rawCostTotal.toFixed(2);
+    document.getElementById('finished_total').innerText = finishedQty.toFixed(2);
+    document.getElementById('yield_percent').innerText = yieldPercent.toFixed(2) + '%';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Receipt - {{ bill_no }}</title>
+    <style>
+        /* Professional Receipt Styling */
+        body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; padding: 20px; background: #eee; }
+        .receipt-card { 
+            width: 350px; background: white; padding: 20px; 
+            border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+        }
+        .text-center { text-align: center; }
+        .line { border-top: 1px dashed #000; margin: 10px 0; }
+        .flex { display: flex; justify-content: space-between; margin: 5px 0; }
+        .brand-name { font-size: 1.5rem; font-weight: bold; color: #2e7d32; margin: 0; }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; padding: 0; }
+            .receipt-card { border: none; box-shadow: none; width: 100%; }
+        }
+    </style>
+</head>
+<body onload="window.print()"> <div class="receipt-card">
+        <div class="no-print text-center" style="margin-bottom: 15px;">
+            <button onclick="window.print()" style="cursor:pointer;">Click to Print</button>
+            <a href="/billing">New Bill</a>
+        </div>
+
+        <div class="text-center">
+            <h1 class="brand-name">AVANI WOOD PRESSED OIL</h1>
+            <small>Pure & Cold Pressed Edible Oils</small><br>
+            <small>Pune, Maharashtra | +91 98XXX XXXXX</small>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="flex"><span>Bill No:</span> <strong>#{{ bill_no }}</strong></div>
+        <div class="flex"><span>Date:</span> <span>{{ date }}</span></div>
+        <div class="flex"><span>Customer:</span> <span>{{ customer }}</span></div>
+
+        <div class="line"></div>
+
+        <div class="flex" style="font-weight: bold;">
+            <span>Description</span>
+            <span>Total</span>
+        </div>
+        <div class="flex">
+            <span>Oil Products (Qty: 1)</span>
+            <span>₹{{ amount }}</span>
+        </div>
+
+        <div class="line"></div>
+
+        <div class="flex" style="font-size: 1.2rem; font-weight: bold;">
+            <span>GRAND TOTAL</span>
+            <span>₹{{ amount }}</span>
+        </div>
+        
+        <div class="flex" style="font-size: 0.8rem; margin-top: 10px;">
+            <span>Payment Mode:</span>
+            <span>{{ mode }}</span>
+        </div>
+        {% if ref and ref != '-' %}
+        <div class="flex" style="font-size: 0.8rem;">
+            <span>Ref No:</span>
+            <span>{{ ref }}</span>
+        </div>
+        {% endif %}
+
+        <div class="line"></div>
+
+        <div class="text-center" style="font-size: 0.8rem; margin-top: 20px;">
+            <p>Thank you! Visit Again.</p>
+            <p>Health is Wealth.</p>
+        </div>
+    </div>
+
+</body>
+</html>

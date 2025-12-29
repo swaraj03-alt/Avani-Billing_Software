@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    /* Dashboard Specific Styles */
+    .dashboard-header {
+        margin-bottom: 30px;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 20px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 2rem;
+        color: #1e293b;
+        margin: 0;
+        font-weight: 800;
+    }
+
+    .dashboard-header p {
+        color: #64748b;
+        font-size: 1.1rem;
+        margin-top: 5px;
+    }
+
+    /* Grid Layout */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    /* Card Styling */
+    .stat-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #2e7d32; /* Avani Green */
+    }
+
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+
+    .stat-card h3 {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .stat-card p {
+        margin: 10px 0 0;
+        color: #64748b;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    /* Color Accents */
+    .bg-sales { background-color: #ecfdf5; color: #10b981; }
+    .bg-purchase { background-color: #eff6ff; color: #3b82f6; }
+    .bg-production { background-color: #fffbeb; color: #f59e0b; }
+    .bg-gst { background-color: #f5f3ff; color: #8b5cf6; }
+
+    .card-footer {
+        margin-top: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #2e7d32;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style>
+
+<div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <p>Avani Wood Cold Pressed Oil – Billing & ERP Overview</p>
+</div>
+
+<div class="cards-grid">
+    <a href="/sale" class="stat-card">
+        <div class="card-icon bg-sales">💰</div>
+        <h3>Sales</h3>
+        <p>Generate GST invoices, track daily revenue, and manage customer credit.</p>
+        <div class="card-footer">Open Sales Module →</div>
+    </a>
+
+    <a href="/purchase" class="stat-card">
+        <div class="card-icon bg-purchase">📦</div>
+        <h3>Purchase</h3>
+        <p>Manage supplier bills, track raw material inward, and expense reports.</p>
+        <div class="card-footer">Open Purchase Module →</div>
+    </a>
+
+    <a href="/production" class="stat-card">
+        <div class="card-icon bg-production">🏭</div>
+        <h3>Production</h3>
+        <p>Monitor oil extraction batches, track yield, and manage processing units.</p>
+        <div class="card-footer">Monitor Production →</div>
+    </a>
+
+    <a href="/gst-return" class="stat-card">
+        <div class="card-icon bg-gst">🏛️</div>
+        <h3>GST Returns</h3>
+        <p>Download GSTR-1, GSTR-3B data and verify tax reconciliation reports.</p>
+        <div class="card-footer">View Compliance →</div>
+    </a>
+</div>
+
+{% endblock %}

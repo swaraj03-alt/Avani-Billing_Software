@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+    .card {
+        border-radius: 14px;
+    }
+    .card-header {
+        border-radius: 14px 14px 0 0;
+    }
+    label {
+        font-size: 0.85rem;
+        color: #555;
+    }
+    .table th {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #666;
+    }
+    .row-total {
+        font-size: 0.95rem;
+    }
+</style>
+
+<div class="container-fluid py-4 bg-light min-vh-100">
+
+    <!-- TOP BAR -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">Sales Invoice</h4>
+            <small class="text-muted">Create new bill</small>
+        </div>
+        <span class="badge bg-success px-3 py-2">{{ today }}</span>
+    </div>
+
+    <form action="/save-sale" method="POST">
+
+        <!-- CUSTOMER & PAYMENT -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <div class="row g-3">
+
+                    <div class="col-12 col-md-4">
+                        <label>Customer *</label>
+                        <select class="form-select" name="customer_id" required>
+                            <option disabled selected>Select Customer</option>
+                            <option>Walk-in Customer</option>
+                            <option>Retail Client</option>
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-2">
+                        <label>Invoice No</label>
+                        <input class="form-control bg-light" value="AUTO" readonly name="invoice_no">
+                    </div>
+
+                    <div class="col-6 col-md-3">
+                        <label>Invoice Date</label>
+                        <input type="date" class="form-control" name="invoice_date" required>
+                    </div>
+
+                    <div class="col-12 col-md-3">
+                        <label>Payment Mode</label>
+                        <select class="form-select" name="payment_mode">
+                            <option>Cash</option>
+                            <option>UPI</option>
+                            <option>Card</option>
+                            <option>Credit</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ITEMS -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center px-3 py-2">
+                <span class="fw-semibold">Item Details</span>
+                <button type="button" class="btn btn-sm btn-success" onclick="addRow()">
+                    + Add Item
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle mb-0" id="sale_table">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>Item</th>
+                            <th width="70">Qty</th>
+                            <th width="90">Rate</th>
+                            <th width="70">GST%</th>
+                            <th width="100">Total</th>
+                            <th width="40"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <input class="form-control" name="product[]" placeholder="Item name">
+                                <input type="hidden" name="hsn[]" value="">
+                                <input type="hidden" name="discount[]" value="0">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control text-center"
+                                       name="qty[]" value="1" onchange="calc(this)">
+                            </td>
+                            <td>
+                                <input type="number" class="form-control text-end"
+                                       name="rate[]" value="0" onchange="calc(this)">
+                            </td>
+                            <td>
+                                <select class="form-select text-center"
+                                        name="tax[]" onchange="calc(this)">
+                                    <option value="0">0</option>
+                                    <option value="5">5</option>
+                                    <option value="12">12</option>
+                                    <option value="18">18</option>
+                                </select>
+                            </td>
+                            <td class="fw-bold text-end row-total">0.00</td>
+                            <td class="text-center">
+                                <button type="button"
+                                        class="btn btn-sm btn-outline-danger"
+                                        onclick="removeRow(this)">✕</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TOTAL SUMMARY -->
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal</span>
+                    <span id="subtotal">0.00</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">GST</span>
+                    <span id="gst_total">0.00</span>
+                </div>
+
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Round Off</span>
+                    <span id="roundoff">0.00</span>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between fs-5 fw-bold text-success">
+                    <span>Grand Total</span>
+                    <span id="grand_total">0.00</span>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="d-grid gap-2 mb-3">
+            <button class="btn btn-success btn-lg shadow-sm">
+                Save Invoice
+            </button>
+            <button type="button" class="btn btn-outline-secondary">
+                Save as Draft
+            </button>
+            <button type="button" class="btn btn-outline-danger">
+                Cancel
+            </button>
+        </div>
+
+    </form>
+</div>
+<script>
+function addRow() {
+    const tbody = document.querySelector("#sale_table tbody");
+    const row = tbody.rows[0].cloneNode(true);
+
+    // Reset values
+    row.querySelectorAll("input").forEach(input => {
+        if (input.type === "number") {
+            input.value = input.name === "qty[]" ? 1 : 0;
+        } else {
+            input.value = "";
+        }
+    });
+
+    row.querySelector("select").value = "0";
+    row.querySelector(".row-total").innerText = "0.00";
+
+    tbody.appendChild(row);
+}
+
+function removeRow(btn) {
+    const tbody = document.querySelector("#sale_table tbody");
+    if (tbody.rows.length > 1) {
+        btn.closest("tr").remove();
+        updateTotals();
+    }
+}
+
+function calc(el) {
+    const row = el.closest("tr");
+
+    const qty = Number(row.querySelector('[name="qty[]"]').value) || 0;
+    const rate = Number(row.querySelector('[name="rate[]"]').value) || 0;
+    const gstP = Number(row.querySelector('[name="tax[]"]').value) || 0;
+
+    const taxable = qty * rate;
+    const gstAmt = taxable * gstP / 100;
+    const total = taxable + gstAmt;
+
+    row.querySelector(".row-total").innerText = total.toFixed(2);
+
+    updateTotals();
+}
+
+function updateTotals() {
+    let subtotal = 0;
+    let gstTotal = 0;
+
+    document.querySelectorAll("#sale_table tbody tr").forEach(row => {
+        const qty = Number(row.querySelector('[name="qty[]"]').value) || 0;
+        const rate = Number(row.querySelector('[name="rate[]"]').value) || 0;
+        const gstP = Number(row.querySelector('[name="tax[]"]').value) || 0;
+
+        const taxable = qty * rate;
+        subtotal += taxable;
+        gstTotal += taxable * gstP / 100;
+    });
+
+    const grand = subtotal + gstTotal;
+    const rounded = Math.round(grand);
+    const roundOff = rounded - grand;
+
+    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
+    document.getElementById("gst_total").innerText = gstTotal.toFixed(2);
+    document.getElementById("roundoff").innerText = roundOff.toFixed(2);
+    document.getElementById("grand_total").innerText = rounded.toFixed(2);
+}
+</script>
+
+{% endblock %}

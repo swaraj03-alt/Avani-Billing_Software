@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Avani Billing{% endblock %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-green: #2e7d32;
+            --sidebar-bg: #1e293b; /* Sleek Dark Navy */
+            --sidebar-hover: #334155;
+            --accent-blue: #3b82f6;
+            --content-bg: #f8fafc;
+            --text-main: #334155;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--content-bg);
+            color: var(--text-main);
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 260px;
+            background-color: var(--sidebar-bg);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* LOGO STYLING */
+        .sidebar-logo {
+            height: 70px; /* Big and visible */
+            width: auto;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
+        }
+
+        .sidebar h2 {
+            font-size: 1.2rem;
+            margin: 0;
+            letter-spacing: 1px;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+            padding: 20px 0;
+            overflow-y: auto; /* Scrollable if many links */
+        }
+
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar a:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            padding-left: 30px;
+        }
+
+        .sidebar a.active {
+            background-color: var(--brand-green);
+            color: white;
+            border-right: 4px solid #fff;
+        }
+
+        .logout {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171 !important;
+            margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .logout:hover {
+            background-color: #ef4444 !important;
+            color: white !important;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .content {
+            margin-left: 260px; /* Same as sidebar width */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Header in Content */
+        .top-nav {
+            height: 70px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+
+        .page-wrapper {
+            padding: 40px;
+        }
+
+        /* Scrollbar Styling for Sidebar */
+        .sidebar-nav::-webkit-scrollbar { width: 5px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" alt="Avani Logo" class="sidebar-logo">
+            <h2>AVANI OIL</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/dashboard">📊 Dashboard</a>
+            <a href="/sale">💰 Sale</a>
+            <a href="/purchase">🛒 Purchase</a>
+            <a href="/payments">💸 Payments</a>
+            <a href="/generate-invoice">📑 Receipts</a>
+            <a href="/production">🏭 Production</a>
+            <a href="/quotations">📝 Quotations</a>
+            <a href="/eway-bill">🚚 E-Way Bill</a>
+            <a href="/gst-return">🏦 GST Return</a>
+            <a href="/gstr-2a">🔍 GSTR-2A</a>
+            <a href="/gstr-2b">🔎 GSTR-2B</a>
+            <a href="/reconciliation">⚖️ Reconciliation</a>
+        </nav>
+
+        <a class="logout" href="/logout">🚪 Logout</a>
+    </aside>
+
+    <main class="content">
+        <header class="top-nav">
+            <div style="font-weight: 600; color: var(--brand-green);"></div>
+            <div style="font-size: 0.9rem; color: #94a3b8;">Welcome back, <strong>Avani Oil </strong></div>
+        </header>
+
+        <div class="page-wrapper">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+</div>
+
+</body>
+</html>

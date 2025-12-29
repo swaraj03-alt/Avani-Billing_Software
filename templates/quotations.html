@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}Quotation{% endblock %}
+
+{% block content %}
+
+<!-- PRINT AREA START -->
+<div class="quotation-box print-area">
+
+    <!-- HEADER -->
+    <div class="q-header">
+        <div class="company">
+            <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="logo">
+            <div>
+                <h2>Avani Wood Cold Pressed Oil</h2>
+                <p>Amravati, Maharashtra</p>
+                <p>GSTIN: 27XXXXXXXXXX</p>
+                <p>Phone: +91-XXXXXXXXXX</p>
+            </div>
+        </div>
+
+        <div class="q-title">
+            <h1>QUOTATION</h1>
+            <p><b>Quotation No:</b> QTN-001</p>
+            <p><b>Date:</b> <input type="date"></p>
+            <p><b>Valid Until:</b> <input type="date"></p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- CUSTOMER DETAILS -->
+    <div class="q-address">
+        <div>
+            <h4>Quote To</h4>
+            <input id="customerName" placeholder="Customer Name">
+            <input placeholder="Address">
+            <input placeholder="GSTIN">
+        </div>
+        <div>
+            <h4>Ship To</h4>
+            <input placeholder="Shipping Address">
+            <p>Place of Supply: MH (27)</p>
+        </div>
+    </div>
+
+    <!-- ITEM TABLE -->
+    <table class="q-table" id="itemsTable">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Description</th>
+                <th>HSN</th>
+                <th>Qty</th>
+                <th>Price ₹</th>
+                <th>Taxable ₹</th>
+                <th>CGST 9%</th>
+                <th>SGST 9%</th>
+                <th>Amount ₹</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td><input value="Groundnut Oil 1L"></td>
+                <td><input value="1515"></td>
+                <td><input type="number" value="1" oninput="calculate()"></td>
+                <td><input type="number" value="500" oninput="calculate()"></td>
+                <td class="taxable">500.00</td>
+                <td class="cgst">45.00</td>
+                <td class="sgst">45.00</td>
+                <td class="amount">590.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- ADD PRODUCT -->
+    <button class="add-btn no-print" onclick="addRow()">+ Add Product</button>
+
+    <!-- TOTALS -->
+    <div class="q-totals">
+        <table>
+            <tr>
+                <td>Total Taxable Value</td>
+                <td>₹ <span id="taxable_total">500.00</span></td>
+            </tr>
+            <tr>
+                <td>Total Tax Amount</td>
+                <td>₹ <span id="tax_total">90.00</span></td>
+            </tr>
+            <tr class="grand">
+                <td>Total Value</td>
+                <td>₹ <span id="grand_total">590.00</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="q-sign">
+        <p>For Avani Wood Cold Pressed Oil</p><br><br>
+        <p><b>Authorized Signatory</b></p>
+    </div>
+
+</div>
+<!-- PRINT AREA END -->
+
+<!-- ACTION BUTTONS -->
+<div class="q-actions no-print">
+    <button onclick="window.print()">Print Quotation</button>
+    <button class="convert">Convert to Invoice</button>
+    <button class="whatsapp" onclick="shareWhatsApp()">Share on WhatsApp</button>
+</div>
+
+<!-- JAVASCRIPT -->
+<script>
+function addRow() {
+    const tbody = document.querySelector("#itemsTable tbody");
+    const rowCount = tbody.rows.length + 1;
+
+    const row = tbody.insertRow();
+    row.innerHTML = `
+        <td>${rowCount}</td>
+        <td><input></td>
+        <td><input></td>
+        <td><input type="number" value="1" oninput="calculate()"></td>
+        <td><input type="number" value="0" oninput="calculate()"></td>
+        <td class="taxable">0.00</td>
+        <td class="cgst">0.00</td>
+        <td class="sgst">0.00</td>
+        <td class="amount">0.00</td>
+    `;
+}
+
+function calculate() {
+    const rows = document.querySelectorAll("#itemsTable tbody tr");
+    let totalTaxable = 0, totalTax = 0, grandTotal = 0;
+
+    rows.forEach(row => {
+        const qty = Number(row.cells[3].querySelector("input").value) || 0;
+        const price = Number(row.cells[4].querySelector("input").value) || 0;
+
+        const taxable = qty * price;
+        const cgst = taxable * 0.09;
+        const sgst = taxable * 0.09;
+        const amount = taxable + cgst + sgst;
+
+        row.querySelector(".taxable").innerText = taxable.toFixed(2);
+        row.querySelector(".cgst").innerText = cgst.toFixed(2);
+        row.querySelector(".sgst").innerText = sgst.toFixed(2);
+        row.querySelector(".amount").innerText = amount.toFixed(2);
+
+        totalTaxable += taxable;
+        totalTax += cgst + sgst;
+        grandTotal += amount;
+    });
+
+    document.getElementById("taxable_total").innerText = totalTaxable.toFixed(2);
+    document.getElementById("tax_total").innerText = totalTax.toFixed(2);
+    document.getElementById("grand_total").innerText = grandTotal.toFixed(2);
+}
+
+function shareWhatsApp() {
+    const customer = document.getElementById("customerName").value || "Customer";
+    const total = document.getElementById("grand_total").innerText;
+
+    const message =
+`Quotation from Avani Wood Cold Pressed Oil
+
+Customer: ${customer}
+Total Amount: ₹${total}
+
+Thank you.`;
+
+    const phone = "91XXXXXXXXXX";  // replace later
+    window.open(
+        "https://wa.me/" + phone + "?text=" + encodeURIComponent(message),
+        "_blank"
+    );
+}
+</script>
+
+{% endblock %}

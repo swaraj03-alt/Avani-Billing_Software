@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Invoice{% endblock %}
+
+{% block content %}
+<div class="invoice-box print-area">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between mb-3">
+        <div>
+            <h3>Avani Wood Cold Pressed Oil</h3>
+            <p>Amravati, Maharashtra</p>
+            <p>GSTIN: 27XXXXXXXXXX</p>
+        </div>
+        <div class="text-end">
+            <h4>TAX INVOICE</h4>
+            <p><b>Invoice No:</b> {{ invoice_no }}</p>
+            <p><b>Date:</b> {{ invoice_date }}</p>
+            <p><b>Payment:</b> {{ payment_mode }}</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- CUSTOMER -->
+    <p><b>Billed To:</b> {{ customer }}</p>
+
+    <!-- ITEMS -->
+    <table class="table table-bordered mt-3">
+        <thead class="table-light text-center">
+            <tr>
+                <th>#</th>
+                <th>Product</th>
+                <th>HSN</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Disc</th>
+                <th>GST %</th>
+                <th>Total ₹</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr class="text-center">
+                <td>{{ loop.index }}</td>
+                <td>{{ item.product }}</td>
+                <td>{{ item.hsn }}</td>
+                <td>{{ item.qty }}</td>
+                <td>{{ item.rate }}</td>
+                <td>{{ item.discount }}</td>
+                <td>{{ item.tax }}</td>
+                <td class="fw-bold">{{ item.total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- TOTALS -->
+    <div class="row mt-4">
+        <div class="col-6"></div>
+        <div class="col-6">
+            <table class="table">
+                <tr>
+                    <td>Subtotal</td>
+                    <td class="text-end">₹ {{ subtotal }}</td>
+                </tr>
+                <tr>
+                    <td>GST</td>
+                    <td class="text-end">₹ {{ gst_total }}</td>
+                </tr>
+                <tr>
+                    <td>Round Off</td>
+                    <td class="text-end">₹ {{ roundoff }}</td>
+                </tr>
+                <tr class="fw-bold fs-5">
+                    <td>Grand Total</td>
+                    <td class="text-end">₹ {{ grand_total }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <p class="mt-4"><b>Authorized Signature</b></p>
+
+</div>
+
+<!-- ACTIONS -->
+<div class="no-print mt-3">
+    <button class="btn btn-success" onclick="window.print()">Print Invoice</button>
+    <a href="/sale" class="btn btn-secondary">New Sale</a>
+</div>
+
+{% endblock %}
