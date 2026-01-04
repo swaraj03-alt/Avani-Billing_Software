@@ -1,4 +1,226 @@
 {% extends "base.html" %}
+{% block title %}GSTR-2B{% endblock %}
+
 {% block content %}
-<h2>GSTR 2B</h2>
+<style>
+/* ================= GSTR 2B ================= */
+
+.page-header {
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.page-header p {
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* FILTER BAR */
+.filter-bar {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.filter-bar label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #475569;
+}
+
+.filter-bar select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+}
+
+/* SUMMARY */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.summary-card h4 {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+}
+
+.summary-card p {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin: 8px 0 0;
+}
+
+/* TABLE */
+.table-wrap {
+    background: white;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #f8fafc;
+}
+
+th, td {
+    padding: 14px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    font-weight: 700;
+    color: #475569;
+}
+
+/* ITC STATUS */
+.status {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.eligible { background: #dcfce7; color: #15803d; }
+.ineligible { background: #fee2e2; color: #b91c1c; }
+.reversed { background: #fef3c7; color: #92400e; }
+
+/* NOTE BOX */
+.note-box {
+    background: #f8fafc;
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 25px;
+    font-size: 0.9rem;
+    color: #475569;
+}
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+    <h2>GSTR-2B</h2>
+    <p>Static ITC statement – final input tax credit available for the period</p>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar">
+    <label>Return Period</label>
+    <select>
+        <option>April 2025</option>
+        <option>March 2025</option>
+        <option>February 2025</option>
+    </select>
+
+    <label>ITC Type</label>
+    <select>
+        <option>All</option>
+        <option>Eligible</option>
+        <option>Ineligible</option>
+        <option>Reversed</option>
+    </select>
+</div>
+
+<!-- NOTE -->
+<div class="note-box">
+    🔒 <strong>Note:</strong> GSTR-2B is a static statement. ITC shown here is final for this tax period and should be used for filing GSTR-3B.
+</div>
+
+<!-- SUMMARY -->
+<div class="summary-grid">
+    <div class="summary-card">
+        <h4>Total Invoices</h4>
+        <p>88</p>
+    </div>
+    <div class="summary-card">
+        <h4>Eligible ITC</h4>
+        <p>₹ 52,600</p>
+    </div>
+    <div class="summary-card">
+        <h4>Ineligible ITC</h4>
+        <p>₹ 6,480</p>
+    </div>
+    <div class="summary-card">
+        <h4>Reversed ITC</h4>
+        <p>₹ 1,760</p>
+    </div>
+</div>
+
+<!-- TABLE -->
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+    <th>Invoice No</th>
+    <th>Invoice Date</th>
+    <th>Supplier</th>
+    <th>GSTIN</th>
+    <th>Taxable</th>
+    <th>GST</th>
+    <th>ITC Status</th>
+</tr>
+</thead>
+<tbody>
+
+<tr>
+    <td>INV-4589</td>
+    <td>05-Apr-2025</td>
+    <td>ABC Traders</td>
+    <td>27ABCDE1234F1Z5</td>
+    <td>₹10,000</td>
+    <td>₹1,800</td>
+    <td><span class="status eligible">ELIGIBLE</span></td>
+</tr>
+
+<tr>
+    <td>INV-4621</td>
+    <td>12-Apr-2025</td>
+    <td>XYZ Oils</td>
+    <td>27XYZDE9876P1Z9</td>
+    <td>₹12,000</td>
+    <td>₹2,160</td>
+    <td><span class="status ineligible">INELIGIBLE</span></td>
+</tr>
+
+<tr>
+    <td>INV-4702</td>
+    <td>18-Apr-2025</td>
+    <td>Fresh Seeds Co.</td>
+    <td>27FRSHD4455L1Z2</td>
+    <td>₹8,500</td>
+    <td>₹1,530</td>
+    <td><span class="status reversed">REVERSED</span></td>
+</tr>
+
+</tbody>
+</table>
+</div>
+
 {% endblock %}

@@ -1,141 +1,246 @@
 {% extends "base.html" %}
+{% block title %}Production Entry{% endblock %}
+
 {% block content %}
+<style>
+.section-title {
+    font-weight: 700;
+    font-size: 1rem;
+    color: #92400e;
+    margin-bottom: 10px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    color: #475569;
+    font-weight: 600;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.summary-item span:last-child {
+    font-weight: 700;
+}
+
+.summary-highlight {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #92400e;
+}
+</style>
+
 <div class="container-fluid py-4 bg-light min-vh-100">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="fw-bold text-dark">
-            <i class="bi bi-gear-fill text-warning me-2"></i>
-            Production Entry
-        </h2>
-        <span class="badge bg-warning text-dark fs-6">
-            Date: {{ today }}
-        </span>
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold mb-0">🏭 Production Entry</h2>
+        <small class="text-muted">Cold Pressed Oil Manufacturing</small>
     </div>
+    <span class="badge bg-warning text-dark fs-6">
+        {{ today }}
+    </span>
+</div>
 
-    <form action="/save-production" method="POST">
-        <div class="row">
+<form action="/save-production" method="POST">
+<div class="row">
 
-            <!-- LEFT SIDE -->
-            <div class="col-lg-8">
+<!-- LEFT PANEL -->
+<div class="col-lg-8">
 
-                <!-- Batch Info -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white fw-bold text-warning">
-                        <i class="bi bi-hash me-2"></i>Batch Information
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Batch No</label>
-                                <input class="form-control" name="batch_no" value="AUTO" readonly>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Production Date</label>
-                                <input type="date" class="form-control" name="production_date" required>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Status</label>
-                                <select class="form-select" name="status">
-                                    <option>Completed</option>
-                                    <option>In Progress</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Raw Material Consumption -->
-                <div class="card shadow-sm border-0 mb-4">
-                    <div class="card-header bg-white fw-bold text-warning">
-                        <i class="bi bi-box-seam me-2"></i>Raw Material Consumption
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-bordered align-middle" id="raw_table">
-                            <thead class="table-light text-center">
-                                <tr>
-                                    <th>Raw Material</th>
-                                    <th>Qty Used (Kg)</th>
-                                    <th>Rate</th>
-                                    <th>Total Cost</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input class="form-control" name="raw_material[]"></td>
-                                    <td><input type="number" class="form-control" name="raw_qty[]" value="0" onchange="calcProduction()"></td>
-                                    <td><input type="number" class="form-control" name="raw_rate[]" value="0" onchange="calcProduction()"></td>
-                                    <td class="fw-bold text-end raw-total">0.00</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Finished Goods -->
-                <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white fw-bold text-warning">
-                        <i class="bi bi-droplet-fill me-2"></i>Finished Goods Output
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Finished Product</label>
-                                <input class="form-control" name="finished_product">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Quantity Produced (Kg/L)</label>
-                                <input type="number" class="form-control" name="finished_qty" onchange="calcProduction()">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="fw-semibold">Wastage (Kg)</label>
-                                <input class="form-control" name="wastage" readonly>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+<!-- STEP 1: BATCH INFO -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="section-title">Step 1: Batch Information</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Batch No</label>
+                <input class="form-control bg-light" value="AUTO" readonly>
             </div>
 
-            <!-- RIGHT SUMMARY -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
-                    <div class="card-header bg-white fw-bold text-warning">
-                        <i class="bi bi-calculator-fill me-2"></i>Production Summary
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Total Raw Qty</span>
-                            <span id="raw_qty_total">0</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Total Raw Cost</span>
-                            <span id="raw_cost_total">0.00</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Finished Qty</span>
-                            <span id="finished_total">0</span>
-                        </div>
-
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Yield %</span>
-                            <span id="yield_percent">0%</span>
-                        </div>
-
-                        <hr>
-
-                        <button class="btn btn-warning btn-lg w-100">
-                            <i class="bi bi-save me-2"></i>Save Production
-                        </button>
-                    </div>
-                </div>
+            <div class="col-md-4">
+                <label class="form-label">Production Date</label>
+                <input type="date" class="form-control" name="production_date" required>
             </div>
 
+            <div class="col-md-4">
+                <label class="form-label">Oil Type</label>
+                <select class="form-select" name="oil_type" required>
+                    <option value="">Select Oil</option>
+                    <option>Groundnut Oil</option>
+                    <option>Coconut Oil</option>
+                    <option>Sesame Oil</option>
+                    <option>Sunflower Oil</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Machine Used</label>
+                <input class="form-control" name="machine" placeholder="Wood Press #1">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Operator Name</label>
+                <input class="form-control" name="operator">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Batch Status</label>
+                <select class="form-select" name="status">
+                    <option>Completed</option>
+                    <option>In Progress</option>
+                </select>
+            </div>
         </div>
-    </form>
+    </div>
+</div>
+
+<!-- STEP 2: RAW MATERIAL -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="section-title">Step 2: Raw Material Consumption</div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle" id="raw_table">
+                <thead class="table-light text-center">
+                    <tr>
+                        <th>Raw Material</th>
+                        <th width="140">Qty Used (Kg)</th>
+                        <th width="140">Rate</th>
+                        <th width="160">Total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <select class="form-select" name="raw_material[]">
+                                <option>Groundnut Seed</option>
+                                <option>Coconut Copra</option>
+                                <option>Sesame Seed</option>
+                                <option>Sunflower Seed</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="number" class="form-control text-end"
+                                   name="raw_qty[]" value="0" onchange="calcProduction()">
+                        </td>
+                        <td>
+                            <input type="number" class="form-control text-end"
+                                   name="raw_rate[]" value="0" onchange="calcProduction()">
+                        </td>
+                        <td class="fw-bold text-end raw-total">0.00</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 3: YIELD & BY-PRODUCTS -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="section-title">Step 3: Yield & By-Products</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Oil Extracted (Liters)</label>
+                <input type="number" step="0.01" class="form-control"
+                       name="oil_extracted" onchange="calcProduction()">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Oil Cake Produced (Kg)</label>
+                <input type="number" step="0.01" class="form-control"
+                       name="oil_cake">
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Wastage (Kg)</label>
+                <input class="form-control bg-light" name="wastage" readonly>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- STEP 4: QUALITY CHECK -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <div class="section-title">Step 4: Quality Check</div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Temperature</label>
+                <select class="form-select" name="temperature">
+                    <option>Below 45°C</option>
+                    <option>Above 45°C</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">QC Status</label>
+                <select class="form-select" name="qc_status">
+                    <option>Approved</option>
+                    <option>Rejected</option>
+                </select>
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">QC Remarks</label>
+                <input class="form-control" name="qc_remarks">
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- RIGHT SUMMARY -->
+<div class="col-lg-4">
+<div class="card shadow-sm border-0 sticky-top" style="top: 20px;">
+    <div class="card-body">
+
+        <div class="section-title">Production Summary</div>
+
+        <div class="summary-item">
+            <span>Total Raw Material</span>
+            <span id="raw_qty_total">0.00 Kg</span>
+        </div>
+
+        <div class="summary-item">
+            <span>Total Raw Cost</span>
+            <span id="raw_cost_total">₹ 0.00</span>
+        </div>
+
+        <div class="summary-item">
+            <span>Oil Extracted</span>
+            <span id="oil_extracted_total">0.00 L</span>
+        </div>
+
+        <div class="summary-item">
+            <span>Oil Cake</span>
+            <span id="oil_cake_total">0.00 Kg</span>
+        </div>
+
+        <div class="summary-item">
+            <span>Yield</span>
+            <span id="yield_percent" class="summary-highlight">0%</span>
+        </div>
+
+        <hr>
+
+        <button class="btn btn-warning btn-lg w-100">
+            💾 Save Production Entry
+        </button>
+
+    </div>
+</div>
+</div>
+
+</div>
+</form>
 </div>
 
 <script>
@@ -144,26 +249,32 @@ function calcProduction() {
     let rawCostTotal = 0;
 
     document.querySelectorAll('#raw_table tbody tr').forEach(row => {
-        let qty = +row.querySelector('[name="raw_qty[]"]').value;
-        let rate = +row.querySelector('[name="raw_rate[]"]').value;
-        let total = qty * rate;
+        let qty = Number(row.querySelector('[name="raw_qty[]"]').value) || 0;
+        let rate = Number(row.querySelector('[name="raw_rate[]"]').value) || 0;
 
+        let total = qty * rate;
         rawQtyTotal += qty;
         rawCostTotal += total;
 
         row.querySelector('.raw-total').innerText = total.toFixed(2);
     });
 
-    let finishedQty = +document.querySelector('[name="finished_qty"]').value || 0;
-    let wastage = rawQtyTotal - finishedQty;
-    let yieldPercent = rawQtyTotal > 0 ? (finishedQty / rawQtyTotal) * 100 : 0;
+    let oilExtracted = Number(document.querySelector('[name="oil_extracted"]').value) || 0;
+    let oilCake = Number(document.querySelector('[name="oil_cake"]').value) || 0;
+
+    let wastage = rawQtyTotal - (oilExtracted + oilCake);
+    let yieldPercent = rawQtyTotal > 0
+        ? (oilExtracted / rawQtyTotal) * 100
+        : 0;
 
     document.querySelector('[name="wastage"]').value = wastage.toFixed(2);
 
-    document.getElementById('raw_qty_total').innerText = rawQtyTotal.toFixed(2);
-    document.getElementById('raw_cost_total').innerText = rawCostTotal.toFixed(2);
-    document.getElementById('finished_total').innerText = finishedQty.toFixed(2);
-    document.getElementById('yield_percent').innerText = yieldPercent.toFixed(2) + '%';
+    document.getElementById('raw_qty_total').innerText = rawQtyTotal.toFixed(2) + " Kg";
+    document.getElementById('raw_cost_total').innerText = "₹ " + rawCostTotal.toFixed(2);
+    document.getElementById('oil_extracted_total').innerText = oilExtracted.toFixed(2) + " L";
+    document.getElementById('oil_cake_total').innerText = oilCake.toFixed(2) + " Kg";
+    document.getElementById('yield_percent').innerText = yieldPercent.toFixed(2) + "%";
 }
 </script>
+
 {% endblock %}

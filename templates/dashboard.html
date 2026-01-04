@@ -3,130 +3,239 @@
 
 {% block content %}
 <style>
-    /* Dashboard Specific Styles */
-    .dashboard-header {
-        margin-bottom: 30px;
-        border-bottom: 2px solid #e2e8f0;
-        padding-bottom: 20px;
-    }
+/* ================= DASHBOARD ================= */
 
-    .dashboard-header h1 {
-        font-size: 2rem;
-        color: #1e293b;
-        margin: 0;
-        font-weight: 800;
-    }
+.dashboard-header {
+    margin-bottom: 30px;
+}
 
-    .dashboard-header p {
-        color: #64748b;
-        font-size: 1.1rem;
-        margin-top: 5px;
-    }
+.dashboard-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1e293b;
+}
 
-    /* Grid Layout */
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 25px;
-        margin-top: 20px;
-    }
+.dashboard-header p {
+    color: #64748b;
+    font-size: 1.05rem;
+}
 
-    /* Card Styling */
-    .stat-card {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
-        border: 1px solid #e2e8f0;
-        position: relative;
-        overflow: hidden;
-    }
+/* KPI CARDS */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 35px;
+}
 
-    .stat-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        border-color: #2e7d32; /* Avani Green */
-    }
+.kpi-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid #e2e8f0;
+    transition: 0.3s;
+}
 
-    .card-icon {
-        width: 50px;
-        height: 50px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        margin-bottom: 15px;
-    }
+.kpi-card:hover {
+    transform: translateY(-6px);
+    border-color: #2e7d32;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+}
 
-    .stat-card h3 {
-        margin: 0;
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #1e293b;
-    }
+.kpi-title {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 600;
+}
 
-    .stat-card p {
-        margin: 10px 0 0;
-        color: #64748b;
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
+.kpi-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-top: 8px;
+    color: #1e293b;
+}
 
-    /* Color Accents */
-    .bg-sales { background-color: #ecfdf5; color: #10b981; }
-    .bg-purchase { background-color: #eff6ff; color: #3b82f6; }
-    .bg-production { background-color: #fffbeb; color: #f59e0b; }
-    .bg-gst { background-color: #f5f3ff; color: #8b5cf6; }
+.kpi-sub {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
 
-    .card-footer {
-        margin-top: 20px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #2e7d32;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
+/* QUICK ACTIONS */
+.quick-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 35px;
+    flex-wrap: wrap;
+}
+
+.quick-actions a {
+    background: #2e7d32;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.quick-actions a.secondary {
+    background: #334155;
+}
+
+.quick-actions a:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+/* MODULE CARDS */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+.stat-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    transition: 0.3s;
+    border: 1px solid #e2e8f0;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px);
+    border-color: #2e7d32;
+    box-shadow: 0 15px 25px rgba(0,0,0,0.1);
+}
+
+.card-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.stat-card h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.stat-card p {
+    margin-top: 8px;
+    color: #64748b;
+    font-size: 0.95rem;
+}
+
+/* COLORS */
+.bg-sales { background: #ecfdf5; color: #10b981; }
+.bg-purchase { background: #eff6ff; color: #3b82f6; }
+.bg-production { background: #fffbeb; color: #f59e0b; }
+.bg-gst { background: #f5f3ff; color: #8b5cf6; }
+
+/* CHART PLACEHOLDER */
+.chart-box {
+    background: white;
+    border: 1px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 25px;
+    margin-top: 35px;
+    text-align: center;
+    color: #64748b;
+    font-size: 0.95rem;
+}
 </style>
 
+<!-- HEADER -->
 <div class="dashboard-header">
     <h1>Dashboard</h1>
-    <p>Avani Wood Cold Pressed Oil – Billing & ERP Overview</p>
+    <p>Avani Wood Cold Pressed Oil – Business Overview</p>
 </div>
 
+<!-- KPI SUMMARY -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-title">Today Sales</div>
+        <div class="kpi-value">₹ 18,450</div>
+        <div class="kpi-sub">Invoices: 6</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-title">Monthly Revenue</div>
+        <div class="kpi-value">₹ 4,82,300</div>
+        <div class="kpi-sub">April 2025</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-title">Outstanding Amount</div>
+        <div class="kpi-value">₹ 52,600</div>
+        <div class="kpi-sub">From 8 customers</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-title">Estimated GST Liability</div>
+        <div class="kpi-value">₹ 36,420</div>
+        <div class="kpi-sub">Based on current invoices</div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-title">Compliance Status</div>
+        <div class="kpi-value" style="color:#f59e0b;">Reconciliation Pending</div>
+        <div class="kpi-sub">GSTR-2B verification required</div>
+    </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="quick-actions">
+    <a href="/invoices">📄 Invoices</a>
+    <a href="/sale" class="secondary">➕ New Invoice</a>
+    <a href="/customers" class="secondary">👥 Customers</a>
+    <a href="/items" class="secondary">📦 Items</a>
+</div>
+
+<!-- MODULE CARDS -->
 <div class="cards-grid">
     <a href="/sale" class="stat-card">
         <div class="card-icon bg-sales">💰</div>
         <h3>Sales</h3>
-        <p>Generate GST invoices, track daily revenue, and manage customer credit.</p>
-        <div class="card-footer">Open Sales Module →</div>
+        <p>Create GST invoices, manage receivables, and track revenue.</p>
     </a>
 
     <a href="/purchase" class="stat-card">
         <div class="card-icon bg-purchase">📦</div>
         <h3>Purchase</h3>
-        <p>Manage supplier bills, track raw material inward, and expense reports.</p>
-        <div class="card-footer">Open Purchase Module →</div>
+        <p>Supplier bills, inward entries, and expense management.</p>
     </a>
 
     <a href="/production" class="stat-card">
         <div class="card-icon bg-production">🏭</div>
         <h3>Production</h3>
-        <p>Monitor oil extraction batches, track yield, and manage processing units.</p>
-        <div class="card-footer">Monitor Production →</div>
+        <p>Track oil batches, yield, and processing units.</p>
     </a>
 
     <a href="/gst-return" class="stat-card">
         <div class="card-icon bg-gst">🏛️</div>
-        <h3>GST Returns</h3>
-        <p>Download GSTR-1, GSTR-3B data and verify tax reconciliation reports.</p>
-        <div class="card-footer">View Compliance →</div>
+        <h3>GST Compliance</h3>
+        <p>GST Return, GSTR-2A/2B and reconciliation management.</p>
     </a>
+</div>
+
+<!-- CHART PLACEHOLDERS -->
+<div class="chart-box">
+    📈 Sales Trend Chart (Monthly) – Chart.js integration ready
+</div>
+
+<div class="chart-box">
+    🧾 Tax Liability Breakup (CGST / SGST / IGST)
 </div>
 
 {% endblock %}

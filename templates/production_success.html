@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}Production Saved{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+<div class="card shadow border-0">
+    <div class="card-body">
+
+        <h3 class="fw-bold text-success mb-3">
+            ✅ Production Entry Saved Successfully
+        </h3>
+
+        <p class="text-muted">Avanu Wood Cold Pressed Oil</p>
+
+        <hr>
+
+        <!-- BASIC INFO -->
+        <h5 class="fw-bold">Batch Details</h5>
+        <div class="row mb-3">
+            <div class="col-md-4"><strong>Date:</strong> {{ production_date }}</div>
+            <div class="col-md-4"><strong>Oil Type:</strong> {{ oil_type }}</div>
+            <div class="col-md-4"><strong>Status:</strong> {{ status }}</div>
+            <div class="col-md-4"><strong>Machine:</strong> {{ machine }}</div>
+            <div class="col-md-4"><strong>Operator:</strong> {{ operator }}</div>
+        </div>
+
+        <hr>
+
+        <!-- RAW MATERIAL TABLE -->
+        <h5 class="fw-bold">Raw Material Used</h5>
+        <table class="table table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Material</th>
+                    <th class="text-end">Qty (Kg)</th>
+                    <th class="text-end">Rate</th>
+                    <th class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in raw_items %}
+                <tr>
+                    <td>{{ item.material }}</td>
+                    <td class="text-end">{{ item.qty }}</td>
+                    <td class="text-end">₹ {{ item.rate }}</td>
+                    <td class="text-end">₹ {{ item.total }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p><strong>Total Raw Qty:</strong> {{ total_raw_qty }} Kg</p>
+        <p><strong>Total Raw Cost:</strong> ₹ {{ total_raw_cost }}</p>
+
+        <hr>
+
+        <!-- PRODUCTION OUTPUT -->
+        <h5 class="fw-bold">Production Output</h5>
+        <div class="row mb-3">
+            <div class="col-md-4"><strong>Oil Extracted:</strong> {{ oil_extracted }} L</div>
+            <div class="col-md-4"><strong>Oil Cake:</strong> {{ oil_cake }} Kg</div>
+            <div class="col-md-4"><strong>Wastage:</strong> {{ wastage }} Kg</div>
+        </div>
+
+        <h4 class="text-warning">
+            Yield: {{ yield_percent | round(2) }} %
+        </h4>
+
+        <hr>
+
+        <!-- QUALITY -->
+        <h5 class="fw-bold">Quality Check</h5>
+        <p><strong>Temperature:</strong> {{ temperature }}</p>
+        <p><strong>Status:</strong> {{ qc_status }}</p>
+        <p><strong>Remarks:</strong> {{ qc_remarks }}</p>
+
+        <hr>
+
+        <div class="d-flex gap-2">
+            <a href="/production" class="btn btn-secondary">
+                ➕ New Production Entry
+            </a>
+            <a href="/dashboard" class="btn btn-success">
+                🏠 Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>
+
+</div>
+{% endblock %}

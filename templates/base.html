@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Avani Billing{% endblock %}</title>
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
             --brand-green: #2e7d32;
-            --sidebar-bg: #1e293b; /* Sleek Dark Navy */
+            --sidebar-bg: #1e293b;
             --sidebar-hover: #334155;
-            --accent-blue: #3b82f6;
             --content-bg: #f8fafc;
             --text-main: #334155;
         }
@@ -27,7 +28,7 @@
             min-height: 100vh;
         }
 
-        /* --- SIDEBAR --- */
+        /* SIDEBAR */
         .sidebar {
             width: 260px;
             background-color: var(--sidebar-bg);
@@ -36,7 +37,6 @@
             flex-direction: column;
             position: fixed;
             height: 100vh;
-            transition: all 0.3s ease;
         }
 
         .sidebar-header {
@@ -45,36 +45,30 @@
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* LOGO STYLING */
         .sidebar-logo {
-            height: 70px; /* Big and visible */
-            width: auto;
+            height: 70px;
             margin-bottom: 10px;
-            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2));
         }
 
         .sidebar h2 {
             font-size: 1.2rem;
             margin: 0;
-            letter-spacing: 1px;
-            color: #ffffff;
+            color: #fff;
             font-weight: 700;
         }
 
         .sidebar-nav {
             flex-grow: 1;
             padding: 20px 0;
-            overflow-y: auto; /* Scrollable if many links */
+            overflow-y: auto;
         }
 
         .sidebar a {
-            display: flex;
-            align-items: center;
+            display: block;
             padding: 12px 25px;
             color: #cbd5e1;
             text-decoration: none;
             font-size: 0.95rem;
-            font-weight: 500;
             transition: all 0.2s;
         }
 
@@ -84,16 +78,60 @@
             padding-left: 30px;
         }
 
-        .sidebar a.active {
-            background-color: var(--brand-green);
-            color: white;
-            border-right: 4px solid #fff;
+        /* ===== SALES MENU FIX ===== */
+
+        .menu-item {
+            position: relative;
         }
 
+        .menu-main {
+            display: block;
+            padding: 12px 25px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+
+        .menu-main:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+            padding-left: 30px;
+        }
+
+        .menu-arrow {
+            position: absolute;
+            right: 20px;
+            top: 14px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+        }
+
+        .menu-arrow:hover {
+            color: white;
+        }
+
+        .submenu {
+            display: none;
+            background: #0f172a;
+        }
+
+        .submenu a {
+            padding: 10px 45px;
+            display: block;
+            font-size: 0.88rem;
+            color: #cbd5e1;
+        }
+
+        .submenu a:hover {
+            background-color: var(--sidebar-hover);
+            color: white;
+        }
+
+        /* LOGOUT */
         .logout {
             background-color: rgba(239, 68, 68, 0.1);
             color: #f87171 !important;
-            margin-top: auto;
             border-top: 1px solid rgba(255,255,255,0.1);
         }
 
@@ -102,21 +140,18 @@
             color: white !important;
         }
 
-        /* --- MAIN CONTENT --- */
+        /* CONTENT */
         .content {
-            margin-left: 260px; /* Same as sidebar width */
+            margin-left: 260px;
             flex-grow: 1;
-            display: flex;
-            flex-direction: column;
         }
 
-        /* Top Header in Content */
         .top-nav {
             height: 70px;
             background: white;
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
             padding: 0 40px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
@@ -124,50 +159,77 @@
         .page-wrapper {
             padding: 40px;
         }
-
-        /* Scrollbar Styling for Sidebar */
-        .sidebar-nav::-webkit-scrollbar { width: 5px; }
-        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
+
 <body>
 
 <div class="layout">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" alt="Avani Logo" class="sidebar-logo">
-            <h2>AVANI OIL</h2>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="sidebar-logo">
+        <h2>AVANI OIL</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <a href="/dashboard">📊 Dashboard</a>
+
+        <!-- SALES (CORRECT BEHAVIOR) -->
+        <div class="menu-item">
+            <a href="/sale" class="menu-main">💰 Sale</a>
+            <span class="menu-arrow" onclick="toggleMenu(this)">▾</span>
+
+            <div class="submenu">
+                <a href="/customers">Customers</a>
+                <a href="/items">Items</a>
+                <a href="/quotations">Quotations</a>
+                <a href="/sales-orders">Sales Orders</a>
+                <a href="/delivery-challan">Delivery Challans</a>
+                <a href="/sale">Invoices</a>
+                <a href="/payments">Payments Received</a>
+                <a href="/credit-notes">Credit Notes</a>
+                <a href="/sales-reports">Sales Reports</a>
+            </div>
         </div>
 
-        <nav class="sidebar-nav">
-            <a href="/dashboard">📊 Dashboard</a>
-            <a href="/sale">💰 Sale</a>
-            <a href="/purchase">🛒 Purchase</a>
-            <a href="/payments">💸 Payments</a>
-            <a href="/generate-invoice">📑 Receipts</a>
-            <a href="/production">🏭 Production</a>
-            <a href="/quotations">📝 Quotations</a>
-            <a href="/eway-bill">🚚 E-Way Bill</a>
-            <a href="/gst-return">🏦 GST Return</a>
-            <a href="/gstr-2a">🔍 GSTR-2A</a>
-            <a href="/gstr-2b">🔎 GSTR-2B</a>
-            <a href="/reconciliation">⚖️ Reconciliation</a>
-        </nav>
+        <!-- OTHER MODULES -->
+        <a href="/purchase">🛒 Purchase</a>
+        <a href="/payments">💸 Payments</a>
+        <a href="/generate-invoice">📑 Receipts</a>
+        <a href="/production">🏭 Production</a>
+        <a href="/eway-bill">🚚 E-Way Bill</a>
+        <a href="/gst-return">🏦 GST Return</a>
+        <a href="/gstr-2a">🔍 GSTR-2A</a>
+        <a href="/gstr-2b">🔎 GSTR-2B</a>
+        <a href="/reconciliation">⚖️ Reconciliation</a>
 
-        <a class="logout" href="/logout">🚪 Logout</a>
-    </aside>
+    </nav>
 
-    <main class="content">
-        <header class="top-nav">
-            <div style="font-weight: 600; color: var(--brand-green);"></div>
-            <div style="font-size: 0.9rem; color: #94a3b8;">Welcome back, <strong>Avani Oil </strong></div>
-        </header>
+    <a class="logout" href="/logout">🚪 Logout</a>
+</aside>
 
-        <div class="page-wrapper">
-            {% block content %}{% endblock %}
-        </div>
-    </main>
+<main class="content">
+    <header class="top-nav">
+        <div></div>
+        <div>Welcome back, <strong>Avani Oil</strong></div>
+    </header>
+
+    <div class="page-wrapper">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
 </div>
+
+<script>
+function toggleMenu(el) {
+    const submenu = el.parentElement.querySelector(".submenu");
+    submenu.style.display =
+        submenu.style.display === "block" ? "none" : "block";
+}
+</script>
 
 </body>
 </html>

@@ -1,246 +1,236 @@
-{% extends "base.html" %}
-{% block content %}
+    {% extends "base.html" %}
+    {% block title %}Sale / Billing{% endblock %}
 
-<style>
-    .card {
-        border-radius: 14px;
-    }
-    .card-header {
-        border-radius: 14px 14px 0 0;
-    }
-    label {
-        font-size: 0.85rem;
-        color: #555;
-    }
-    .table th {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: #666;
-    }
-    .row-total {
-        font-size: 0.95rem;
-    }
-</style>
+    {% block content %}
+    <style>
+        .billing-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            align-items: start;
+        }
 
-<div class="container-fluid py-4 bg-light min-vh-100">
+        /* Form Section */
+        .entry-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
 
-    <!-- TOP BAR -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bold mb-0">Sales Invoice</h4>
-            <small class="text-muted">Create new bill</small>
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .full-width { grid-column: span 2; }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        input {
+            padding: 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--brand-green); }
+
+        .btn-add {
+            grid-column: span 2;
+            background: var(--brand-green, #2e7d32);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.2s;
+        }
+
+        .btn-add:hover { opacity: 0.9; }
+
+        /* Invoice/Table Section */
+        .invoice-preview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            min-height: 500px;
+        }
+
+        .invoice-header {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 15px 15px 0 0;
+            border-bottom: 2px dashed #e2e8f0;
+            text-align: center;
+        }
+
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .bill-table th {
+            text-align: left;
+            padding: 12px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #64748b;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .bill-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .total-section {
+            margin-top: auto;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 0 0 15px 15px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #1e293b;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background: #4f46e5;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 15px;
+            cursor: pointer;
+        }
+    </style>
+
+    <div class="billing-container">
+        <div class="entry-card">
+            <h2 style="margin-top:0">Create New Bill</h2>
+            <div class="form-grid">
+                <div class="input-group full-width">
+                    <label>Customer Name</label>
+                    <input type="text" id="custName" placeholder="Search or enter name">
+                </div>
+
+                <div class="input-group full-width">
+                    <label>Scan Product / Search Code</label>
+                    <input type="text" id="prodName" placeholder="Barcode Scanner Input">
+                </div>
+
+                <div class="input-group">
+                    <label>Price (₹)</label>
+                    <input type="number" id="prodPrice" placeholder="0.00">
+                </div>
+
+                <div class="input-group">
+                    <label>Quantity</label>
+                    <input type="number" id="prodQty" value="1">
+                </div>
+
+                <button class="btn-add" onclick="addItem()">+ Add to Bill</button>
+            </div>
         </div>
-        <span class="badge bg-success px-3 py-2">{{ today }}</span>
+
+        <div class="invoice-preview">
+            <div class="invoice-header">
+                <h3 style="margin:0">Avani Wood Pressed Oil</h3>
+                <small>Live Bill Preview</small>
+            </div>
+
+            <table class="bill-table" id="billItems">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Qty</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    </tbody>
+            </table>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Grand Total:</span>
+                    <span id="grandTotal">₹ 0.00</span>
+                </div>
+            <button class="btn-generate" onclick="openPaymentModal()">Proceed to Payment</button>            </div>
+        </div>
     </div>
 
-    <form action="/save-sale" method="POST">
+    <script>
+        let total = 0;
 
-        <!-- CUSTOMER & PAYMENT -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-                <div class="row g-3">
+        function addItem() {
+            const name = document.getElementById('prodName').value;
+            const price = parseFloat(document.getElementById('prodPrice').value);
+            const qty = parseInt(document.getElementById('prodQty').value);
 
-                    <div class="col-12 col-md-4">
-                        <label>Customer *</label>
-                        <select class="form-select" name="customer_id" required>
-                            <option disabled selected>Select Customer</option>
-                            <option>Walk-in Customer</option>
-                            <option>Retail Client</option>
-                        </select>
-                    </div>
+            if(!name || !price) return alert("Please fill product details");
 
-                    <div class="col-6 col-md-2">
-                        <label>Invoice No</label>
-                        <input class="form-control bg-light" value="AUTO" readonly name="invoice_no">
-                    </div>
+            const subtotal = price * qty;
+            total += subtotal;
 
-                    <div class="col-6 col-md-3">
-                        <label>Invoice Date</label>
-                        <input type="date" class="form-control" name="invoice_date" required>
-                    </div>
+            const table = document.getElementById('billItems').getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
 
-                    <div class="col-12 col-md-3">
-                        <label>Payment Mode</label>
-                        <select class="form-select" name="payment_mode">
-                            <option>Cash</option>
-                            <option>UPI</option>
-                            <option>Card</option>
-                            <option>Credit</option>
-                        </select>
-                    </div>
+            newRow.innerHTML = `
+                <td>${name}</td>
+                <td>${qty}</td>
+                <td>₹ ${subtotal.toFixed(2)}</td>
+            `;
 
-                </div>
-            </div>
-        </div>
+            document.getElementById('grandTotal').innerText = `₹ ${total.toFixed(2)}`;
 
-        <!-- ITEMS -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white d-flex justify-content-between align-items-center px-3 py-2">
-                <span class="fw-semibold">Item Details</span>
-                <button type="button" class="btn btn-sm btn-success" onclick="addRow()">
-                    + Add Item
-                </button>
-            </div>
-
-            <div class="table-responsive">
-                <table class="table table-bordered align-middle mb-0" id="sale_table">
-                    <thead class="table-light text-center">
-                        <tr>
-                            <th>Item</th>
-                            <th width="70">Qty</th>
-                            <th width="90">Rate</th>
-                            <th width="70">GST%</th>
-                            <th width="100">Total</th>
-                            <th width="40"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <input class="form-control" name="product[]" placeholder="Item name">
-                                <input type="hidden" name="hsn[]" value="">
-                                <input type="hidden" name="discount[]" value="0">
-                            </td>
-                            <td>
-                                <input type="number" class="form-control text-center"
-                                       name="qty[]" value="1" onchange="calc(this)">
-                            </td>
-                            <td>
-                                <input type="number" class="form-control text-end"
-                                       name="rate[]" value="0" onchange="calc(this)">
-                            </td>
-                            <td>
-                                <select class="form-select text-center"
-                                        name="tax[]" onchange="calc(this)">
-                                    <option value="0">0</option>
-                                    <option value="5">5</option>
-                                    <option value="12">12</option>
-                                    <option value="18">18</option>
-                                </select>
-                            </td>
-                            <td class="fw-bold text-end row-total">0.00</td>
-                            <td class="text-center">
-                                <button type="button"
-                                        class="btn btn-sm btn-outline-danger"
-                                        onclick="removeRow(this)">✕</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- TOTAL SUMMARY -->
-        <div class="card shadow-sm mb-4">
-            <div class="card-body">
-
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">Subtotal</span>
-                    <span id="subtotal">0.00</span>
-                </div>
-
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">GST</span>
-                    <span id="gst_total">0.00</span>
-                </div>
-
-                <div class="d-flex justify-content-between mb-2">
-                    <span class="text-muted">Round Off</span>
-                    <span id="roundoff">0.00</span>
-                </div>
-
-                <hr>
-
-                <div class="d-flex justify-content-between fs-5 fw-bold text-success">
-                    <span>Grand Total</span>
-                    <span id="grand_total">0.00</span>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- ACTION BUTTONS -->
-        <div class="d-grid gap-2 mb-3">
-            <button class="btn btn-success btn-lg shadow-sm">
-                Save Invoice
-            </button>
-            <button type="button" class="btn btn-outline-secondary">
-                Save as Draft
-            </button>
-            <button type="button" class="btn btn-outline-danger">
-                Cancel
-            </button>
-        </div>
-
-    </form>
-</div>
-<script>
-function addRow() {
-    const tbody = document.querySelector("#sale_table tbody");
-    const row = tbody.rows[0].cloneNode(true);
-
-    // Reset values
-    row.querySelectorAll("input").forEach(input => {
-        if (input.type === "number") {
-            input.value = input.name === "qty[]" ? 1 : 0;
-        } else {
-            input.value = "";
+            // Clear inputs for next item
+            document.getElementById('prodName').value = "";
+            document.getElementById('prodPrice').value = "";
+            document.getElementById('prodQty').value = "1";
+            document.getElementById('prodName').focus();
         }
-    });
+        function openPaymentModal() {
+    const customer = document.getElementById('custName').value;
 
-    row.querySelector("select").value = "0";
-    row.querySelector(".row-total").innerText = "0.00";
-
-    tbody.appendChild(row);
-}
-
-function removeRow(btn) {
-    const tbody = document.querySelector("#sale_table tbody");
-    if (tbody.rows.length > 1) {
-        btn.closest("tr").remove();
-        updateTotals();
+    if (total <= 0) {
+        return alert("Please add at least one product.");
     }
+    if (!customer) {
+        return alert("Please enter Customer Name.");
+    }
+
+    // Redirect to the payment page with URL parameters
+    // This sends the name and total to your Flask backend
+    window.location.href = `/payments?customer=${encodeURIComponent(customer)}&total=${total.toFixed(2)}`;
 }
+    </script>
 
-function calc(el) {
-    const row = el.closest("tr");
+    {% endblock %}
 
-    const qty = Number(row.querySelector('[name="qty[]"]').value) || 0;
-    const rate = Number(row.querySelector('[name="rate[]"]').value) || 0;
-    const gstP = Number(row.querySelector('[name="tax[]"]').value) || 0;
-
-    const taxable = qty * rate;
-    const gstAmt = taxable * gstP / 100;
-    const total = taxable + gstAmt;
-
-    row.querySelector(".row-total").innerText = total.toFixed(2);
-
-    updateTotals();
-}
-
-function updateTotals() {
-    let subtotal = 0;
-    let gstTotal = 0;
-
-    document.querySelectorAll("#sale_table tbody tr").forEach(row => {
-        const qty = Number(row.querySelector('[name="qty[]"]').value) || 0;
-        const rate = Number(row.querySelector('[name="rate[]"]').value) || 0;
-        const gstP = Number(row.querySelector('[name="tax[]"]').value) || 0;
-
-        const taxable = qty * rate;
-        subtotal += taxable;
-        gstTotal += taxable * gstP / 100;
-    });
-
-    const grand = subtotal + gstTotal;
-    const rounded = Math.round(grand);
-    const roundOff = rounded - grand;
-
-    document.getElementById("subtotal").innerText = subtotal.toFixed(2);
-    document.getElementById("gst_total").innerText = gstTotal.toFixed(2);
-    document.getElementById("roundoff").innerText = roundOff.toFixed(2);
-    document.getElementById("grand_total").innerText = rounded.toFixed(2);
-}
-</script>
-
-{% endblock %}
