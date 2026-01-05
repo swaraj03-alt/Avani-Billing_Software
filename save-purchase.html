@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Purchase Entry{% endblock %}
+
+{% block content %}
+<style>
+/* same CSS as before – unchanged */
+.purchase-container {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
+}
+@media (max-width: 992px) {
+    .purchase-container { grid-template-columns: 1fr; }
+}
+.entry-card, .purchase-preview {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+</style>
+
+<form method="POST" action="/save-purchase">
+<div class="purchase-container">
+
+<!-- LEFT : PURCHASE ENTRY -->
+<div class="entry-card">
+    <h2>Create Purchase Entry</h2>
+
+    <div class="form-grid">
+        <div class="input-group full-width">
+            <label>Vendor Name</label>
+            <input type="text" name="vendor_name" required>
+        </div>
+
+        <div class="input-group">
+            <label>Bill Number</label>
+            <input type="text" name="bill_no">
+        </div>
+
+        <div class="input-group">
+            <label>Bill Date</label>
+            <input type="date" name="bill_date" required>
+        </div>
+
+        <div class="input-group full-width">
+            <label>Product / Raw Material</label>
+            <input type="text" id="prodName">
+        </div>
+
+        <div class="input-group">
+            <label>Cost Price (₹)</label>
+            <input type="number" id="prodCost">
+        </div>
+
+        <div class="input-group">
+            <label>Quantity</label>
+            <input type="number" id="prodQty" value="1">
+        </div>
+
+        <button type="button" class="btn-add" onclick="addPurchaseItem()">+ Add Item</button>
+    </div>
+</div>
+
+<!-- RIGHT : PREVIEW -->
+<div class="purchase-preview">
+    <div class="preview-header">
+        <h3>Purchase Preview</h3>
+    </div>
+
+    <table class="preview-table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Qty</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody id="purchaseItems"></tbody>
+    </table>
+
+    <!-- HIDDEN INPUTS FOR BACKEND -->
+    <input type="hidden" name="items_json" id="itemsJson">
+    <input type="hidden" name="total_amount" id="totalAmount">
+
+    <div class="total-section">
+        <div class="total-row">
+            <span>Total Cost:</span>
+            <span id="purchaseTotal">₹ 0.00</span>
+        </div>
+
+        <!-- REAL SAVE BUTTON -->
+        <button type="submit" class="btn-save">
+            Save Purchase
+        </button>
+    </div>
+</div>
+
+</div>
+</form>
+
+<script>
+let purchaseTotal = 0;
+let items = [];
+
+function addPurchaseItem() {
+    const name = prodName.value;
+    const cost = parseFloat(prodCost.value);
+    const qty = parseInt(prodQty.value);
+
+    if (!name || !cost) {
+        return alert("Enter item details");
+    }
+
+    const itemTotal = cost * qty;
+    purchaseTotal += itemTotal;
+
+    items.push({
+        item: name,
+        qty: qty,
+        cost: cost,
+        total: itemTotal
+    });
+
+    const row = document.createElement("tr");
+    row.innerHTML = `
+        <td>${name}</td>
+        <td>${qty}</td>
+        <td>₹ ${itemTotal.toFixed(2)}</td>
+    `;
+    document.getElementById("purchaseItems").appendChild(row);
+
+    document.getElementById("purchaseTotal").innerText = `₹ ${purchaseTotal.toFixed(2)}`;
+    document.getElementById("itemsJson").value = JSON.stringify(items);
+    document.getElementById("totalAmount").value = purchaseTotal.toFixed(2);
+
+    prodName.value = "";
+    prodCost.value = "";
+    prodQty.value = "1";
+}
+</script>
+
+{% endblock %}

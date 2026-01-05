@@ -1,172 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Avani Billing{% endblock %}</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Avani Billing{% endblock %}</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
-        :root {
-            --brand-green: #2e7d32;
-            --sidebar-bg: #1e293b;
-            --sidebar-hover: #334155;
-            --content-bg: #f8fafc;
-            --text-main: #334155;
-        }
+<style>
+:root {
+    --brand-green: #2e7d32;
+    --sidebar-bg: #1e293b;
+    --sidebar-hover: #334155;
+    --content-bg: #f8fafc;
+    --text-main: #334155;
+}
 
-        body {
-            margin: 0;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--content-bg);
-            color: var(--text-main);
-        }
+body {
+    margin: 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: var(--content-bg);
+    color: var(--text-main);
+}
 
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
 
-        /* SIDEBAR */
-        .sidebar {
-            width: 260px;
-            background-color: var(--sidebar-bg);
-            color: white;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-        }
+/* ================= SIDEBAR ================= */
+.sidebar {
+    width: 260px;
+    background-color: var(--sidebar-bg);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: 100vh;
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
 
-        .sidebar-header {
-            padding: 30px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
+.sidebar-header {
+    padding: 25px 20px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
 
-        .sidebar-logo {
-            height: 70px;
-            margin-bottom: 10px;
-        }
+.sidebar-logo {
+    height: 65px;
+    margin-bottom: 8px;
+}
 
-        .sidebar h2 {
-            font-size: 1.2rem;
-            margin: 0;
-            color: #fff;
-            font-weight: 700;
-        }
+.sidebar h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    font-weight: 700;
+}
 
-        .sidebar-nav {
-            flex-grow: 1;
-            padding: 20px 0;
-            overflow-y: auto;
-        }
+.sidebar-nav {
+    flex-grow: 1;
+    padding: 15px 0;
+    overflow-y: auto;
+}
 
-        .sidebar a {
-            display: block;
-            padding: 12px 25px;
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: all 0.2s;
-        }
+.sidebar a {
+    display: block;
+    padding: 11px 25px;
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
 
-        .sidebar a:hover {
-            background-color: var(--sidebar-hover);
-            color: white;
-            padding-left: 30px;
-        }
+.sidebar a:hover {
+    background-color: var(--sidebar-hover);
+    color: white;
+    padding-left: 30px;
+}
 
-        /* ===== SALES MENU FIX ===== */
+/* ===== SALES MENU ===== */
+.menu-item {
+    position: relative;
+}
 
-        .menu-item {
-            position: relative;
-        }
+.menu-main {
+    padding: 11px 25px;
+    display: block;
+    color: #cbd5e1;
+    text-decoration: none;
+}
 
-        .menu-main {
-            display: block;
-            padding: 12px 25px;
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 0.95rem;
-        }
+.menu-arrow {
+    position: absolute;
+    right: 18px;
+    top: 12px;
+    cursor: pointer;
+}
 
-        .menu-main:hover {
-            background-color: var(--sidebar-hover);
-            color: white;
-            padding-left: 30px;
-        }
+.submenu {
+    display: none;
+    background: #0f172a;
+}
 
-        .menu-arrow {
-            position: absolute;
-            right: 20px;
-            top: 14px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #cbd5e1;
-        }
+.submenu a {
+    padding: 9px 45px;
+    font-size: 0.88rem;
+}
 
-        .menu-arrow:hover {
-            color: white;
-        }
+/* LOGOUT */
+.logout {
+    background: rgba(239,68,68,0.1);
+    color: #f87171 !important;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
 
-        .submenu {
-            display: none;
-            background: #0f172a;
-        }
+.logout:hover {
+    background: #ef4444;
+    color: white !important;
+}
 
-        .submenu a {
-            padding: 10px 45px;
-            display: block;
-            font-size: 0.88rem;
-            color: #cbd5e1;
-        }
+/* ================= CONTENT ================= */
+.content {
+    margin-left: 260px;
+    flex-grow: 1;
+    transition: margin-left 0.3s ease;
+}
 
-        .submenu a:hover {
-            background-color: var(--sidebar-hover);
-            color: white;
-        }
+.top-nav {
+    height: 65px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 25px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
 
-        /* LOGOUT */
-        .logout {
-            background-color: rgba(239, 68, 68, 0.1);
-            color: #f87171 !important;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
+.hamburger {
+    display: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+}
 
-        .logout:hover {
-            background-color: #ef4444 !important;
-            color: white !important;
-        }
+.page-wrapper {
+    padding: 30px;
+}
 
-        /* CONTENT */
-        .content {
-            margin-left: 260px;
-            flex-grow: 1;
-        }
+/* ================= MOBILE ================= */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
 
-        .top-nav {
-            height: 70px;
-            background: white;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 40px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        }
+    .sidebar.open {
+        transform: translateX(0);
+    }
 
-        .page-wrapper {
-            padding: 40px;
-        }
-    </style>
+    .content {
+        margin-left: 0;
+    }
+
+    .hamburger {
+        display: block;
+    }
+}
+</style>
 </head>
 
 <body>
 
 <div class="layout">
 
-<aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="sidebar-logo">
         <h2>AVANI OIL</h2>
@@ -176,11 +182,9 @@
 
         <a href="/dashboard">📊 Dashboard</a>
 
-        <!-- SALES (CORRECT BEHAVIOR) -->
         <div class="menu-item">
             <a href="/sale" class="menu-main">💰 Sale</a>
             <span class="menu-arrow" onclick="toggleMenu(this)">▾</span>
-
             <div class="submenu">
                 <a href="/customers">Customers</a>
                 <a href="/items">Items</a>
@@ -194,7 +198,6 @@
             </div>
         </div>
 
-        <!-- OTHER MODULES -->
         <a href="/purchase">🛒 Purchase</a>
         <a href="/payments">💸 Payments</a>
         <a href="/generate-invoice">📑 Receipts</a>
@@ -204,15 +207,15 @@
         <a href="/gstr-2a">🔍 GSTR-2A</a>
         <a href="/gstr-2b">🔎 GSTR-2B</a>
         <a href="/reconciliation">⚖️ Reconciliation</a>
-
     </nav>
 
     <a class="logout" href="/logout">🚪 Logout</a>
 </aside>
 
+<!-- CONTENT -->
 <main class="content">
     <header class="top-nav">
-        <div></div>
+        <span class="hamburger" onclick="toggleSidebar()">☰</span>
         <div>Welcome back, <strong>Avani Oil</strong></div>
     </header>
 
@@ -226,8 +229,11 @@
 <script>
 function toggleMenu(el) {
     const submenu = el.parentElement.querySelector(".submenu");
-    submenu.style.display =
-        submenu.style.display === "block" ? "none" : "block";
+    submenu.style.display = submenu.style.display === "block" ? "none" : "block";
+}
+
+function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("open");
 }
 </script>
 

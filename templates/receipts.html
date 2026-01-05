@@ -1,80 +1,190 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Receipt - {{ bill_no }}</title>
-    <style>
-        /* Professional Receipt Styling */
-        body { font-family: 'Arial', sans-serif; display: flex; justify-content: center; padding: 20px; background: #eee; }
-        .receipt-card { 
-            width: 350px; background: white; padding: 20px; 
-            border: 1px solid #ddd; box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-        }
-        .text-center { text-align: center; }
-        .line { border-top: 1px dashed #000; margin: 10px 0; }
-        .flex { display: flex; justify-content: space-between; margin: 5px 0; }
-        .brand-name { font-size: 1.5rem; font-weight: bold; color: #2e7d32; margin: 0; }
-        
-        @media print {
-            .no-print { display: none; }
-            body { background: white; padding: 0; }
-            .receipt-card { border: none; box-shadow: none; width: 100%; }
-        }
-    </style>
+<meta charset="UTF-8">
+<title>GST Invoice</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f8fafc;
+    margin: 0;
+    padding: 20px;
+}
+
+.invoice {
+    max-width: 850px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 15px;
+}
+
+.company h2 {
+    margin: 0;
+    color: #2e7d32;
+}
+
+.company small {
+    color: #475569;
+}
+
+.invoice-details {
+    text-align: right;
+    font-size: 0.9rem;
+}
+
+.section {
+    margin-top: 25px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.table th, .table td {
+    border: 1px solid #e5e7eb;
+    padding: 10px;
+    text-align: right;
+}
+
+.table th {
+    background: #f1f5f9;
+}
+
+.table td:first-child,
+.table th:first-child {
+    text-align: left;
+}
+
+.totals {
+    width: 100%;
+    margin-top: 15px;
+}
+
+.totals td {
+    padding: 8px;
+    text-align: right;
+}
+
+.totals tr:last-child {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.footer {
+    margin-top: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.print-btn {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+@media print {
+    .print-btn { display: none; }
+    body { background: white; padding: 0; }
+}
+</style>
 </head>
-<body onload="window.print()"> <div class="receipt-card">
-        <div class="no-print text-center" style="margin-bottom: 15px;">
-            <button onclick="window.print()" style="cursor:pointer;">Click to Print</button>
-            <a href="/purchase">New Bill</a>
-        </div>
 
-        <div class="text-center">
-            <h1 class="brand-name">AVANI WOOD PRESSED OIL</h1>
-            <small>Pure & Cold Pressed Edible Oils</small><br>
-            <small>Pune, Maharashtra | +91 98XXX XXXXX</small>
-        </div>
+<body>
 
-        <div class="line"></div>
+<div class="invoice">
 
-        <div class="flex"><span>Bill No:</span> <strong>#{{ bill_no }}</strong></div>
-        <div class="flex"><span>Date:</span> <span>{{ date }}</span></div>
-        <div class="flex"><span>Customer:</span> <span>{{ customer }}</span></div>
-
-        <div class="line"></div>
-
-        <div class="flex" style="font-weight: bold;">
-            <span>Description</span>
-            <span>Total</span>
-        </div>
-        <div class="flex">
-            <span>Oil Products (Qty: 1)</span>
-            <span>₹{{ amount }}</span>
-        </div>
-
-        <div class="line"></div>
-
-        <div class="flex" style="font-size: 1.2rem; font-weight: bold;">
-            <span>GRAND TOTAL</span>
-            <span>₹{{ amount }}</span>
-        </div>
-        
-        <div class="flex" style="font-size: 0.8rem; margin-top: 10px;">
-            <span>Payment Mode:</span>
-            <span>{{ mode }}</span>
-        </div>
-        {% if ref and ref != '-' %}
-        <div class="flex" style="font-size: 0.8rem;">
-            <span>Ref No:</span>
-            <span>{{ ref }}</span>
-        </div>
-        {% endif %}
-
-        <div class="line"></div>
-
-        <div class="text-center" style="font-size: 0.8rem; margin-top: 20px;">
-            <p>Thank you! Visit Again.</p>
-            <p>Health is Wealth.</p>
-        </div>
+<!-- HEADER -->
+<div class="header">
+    <div class="company">
+        <h2>Avani Wood Cold Pressed Oil</h2>
+        <small>
+            GSTIN: 27DARPM3874G1Z3<br>
+            Amravati, Maharashtra
+        </small>
     </div>
+
+    <div class="invoice-details">
+        <strong>GST Invoice</strong><br>
+        Invoice No: INV-{{ "%04d"|format(range(1)|random) }}<br>
+        Date: {{ datetime.utcnow().strftime("%d-%m-%Y") }}
+    </div>
+</div>
+
+<!-- CUSTOMER -->
+<div class="section">
+    <strong>Billed To:</strong><br>
+    {{ customer }}<br>
+    Maharashtra
+</div>
+
+<!-- ITEMS -->
+<table class="table">
+<thead>
+<tr>
+    <th>Description</th>
+    <th>Taxable</th>
+    <th>GST</th>
+    <th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>Edible Oil Purchase</td>
+    <td>₹ {{ taxable }}</td>
+    <td>₹ {{ cgst + sgst }}</td>
+    <td>₹ {{ amount }}</td>
+</tr>
+</tbody>
+</table>
+
+<!-- TOTALS -->
+<table class="totals">
+<tr>
+    <td>Taxable Amount</td>
+    <td>₹ {{ taxable }}</td>
+</tr>
+<tr>
+    <td>CGST (2.5%)</td>
+    <td>₹ {{ cgst }}</td>
+</tr>
+<tr>
+    <td>SGST (2.5%)</td>
+    <td>₹ {{ sgst }}</td>
+</tr>
+<tr>
+    <td>Grand Total</td>
+    <td>₹ {{ amount }}</td>
+</tr>
+</table>
+
+<!-- FOOTER -->
+<div class="footer">
+    <div>
+        <strong>Payment Mode:</strong> {{ mode }}<br>
+        <small>This is a system generated invoice</small>
+    </div>
+    <button class="print-btn" onclick="window.print()">🖨 Print Invoice</button>
+</div>
+
+</div>
 
 </body>
 </html>

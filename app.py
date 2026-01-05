@@ -3,6 +3,7 @@ from xhtml2pdf import pisa
 from io import BytesIO
 from datetime import datetime
 import random
+import json
 
 app = Flask(__name__)
 app.secret_key = "avani_secret_key"
@@ -125,7 +126,11 @@ def customers():
 def items():
     if not login_required():
         return redirect(url_for("login"))
-    return render_template("items.html")
+    return render_template("item.html")
+
+@app.route('/production')
+def production():
+    return render_template("production.html")
 
 @app.route("/save-production", methods=["POST"])
 def save_production():
@@ -226,28 +231,27 @@ def payments():
         voucher_no=voucher_no
     )
 
-@app.route('/generate-invoice')
+@app.route("/generate-invoice")
 def generate_invoice():
-    # Capture data from the Payment Page
-    customer = request.args.get('cust', 'Walking Customer')
-    amount = request.args.get('amt', '0.00')
-    mode = request.args.get('mode', 'Cash')
-    ref = request.args.get('ref', '-')
+    customer = request.args.get("cust")
+    amount = float(request.args.get("amt", 0))
+    mode = request.args.get("mode")
 
-    # Generate real-world bill details
-    from datetime import datetime
-    import random
-    date_now = datetime.now().strftime("%d-%b-%Y | %I:%M %p")
-    bill_no = random.randint(5000, 9999)
+    gst_rate = 5  # Example: edible oil
+    taxable = round(amount / (1 + gst_rate/100), 2)
+    gst = round(amount - taxable, 2)
+    cgst = sgst = round(gst / 2, 2)
 
-    # RENDER YOUR EXISTING receipts.html
-    return render_template("receipts.html",
-                           customer=customer,
-                           amount=amount,
-                           mode=mode,
-                           ref=ref,
-                           date=date_now,
-                           bill_no=bill_no)
+    return render_template(
+        "receipts.html",
+        datetime=datetime,
+        customer=customer,
+        amount=amount,
+        taxable=taxable,
+        cgst=cgst,
+        sgst=sgst,
+        mode=mode
+    )
 
 
 # ================= QUOTATIONS =================
@@ -309,12 +313,27 @@ def purchase():
         return redirect(url_for("login"))
     return render_template("purchase.html")
 
+@app.route("/save-purchase", methods=["POST"])
+def save_purchase():
+    vendor = request.form.get("vendor_name")
+    bill_no = request.form.get("bill_no")
+    bill_date = request.form.get("bill_date")
+    total = request.form.get("total_amount")
 
-@app.route("/production")
-def production():
-    if not login_required():
-        return redirect(url_for("login"))
-    return render_template("production.html")
+    items_json = request.form.get("items_json")
+    items = json.loads(items_json) if items_json else []
+
+    # TEMP: verify
+    print("Vendor:", vendor)
+    print("Bill No:", bill_no)
+    print("Date:", bill_date)
+    print("Total:", total)
+    print("Items:", items)
+
+    # ✅ SUCCESS MESSAGE
+    flash("✅ Purchase saved successfully!", "success")
+
+    return redirect(url_for("purchase"))
 
 
 @app.route("/eway-bill")
