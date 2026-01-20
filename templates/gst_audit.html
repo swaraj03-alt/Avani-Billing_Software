@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block title %}GST Audit Trail{% endblock %}
+
+{% block content %}
+<style>
+/* ===== GST AUDIT ===== */
+
+.page-header {
+    margin-bottom: 25px;
+}
+
+.page-header h2 {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.page-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-top: 6px;
+}
+
+/* INFO BOX */
+.info-box {
+    background: #f1f5f9;
+    border-left: 4px solid #2563eb;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: #334155;
+    margin-bottom: 30px;
+}
+
+/* TABLE CARD */
+.audit-card {
+    background: white;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid #e2e8f0;
+}
+
+/* TABLE */
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.audit-table th {
+    background: #f8fafc;
+    padding: 12px;
+    text-align: left;
+    font-weight: 700;
+    color: #334155;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.audit-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+
+.audit-table tr:hover {
+    background: #f9fafb;
+}
+
+/* BADGES */
+.badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.badge-download { background: #dcfce7; color: #15803d; }
+.badge-lock { background: #fee2e2; color: #b91c1c; }
+.badge-view { background: #e0e7ff; color: #3730a3; }
+
+/* ROLE */
+.role {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #64748b;
+    font-size: 0.9rem;
+}
+</style>
+
+<!-- HEADER -->
+<div class="page-header">
+    <h2>📋 GST Audit Trail</h2>
+    <p>Complete activity log for GST returns (CA & system actions)</p>
+</div>
+
+<!-- INFO -->
+<div class="info-box">
+<strong>What is GST Audit?</strong><br>
+This log maintains a <b>non-editable history</b> of all GST-related actions such as:
+<ul style="margin:8px 0 0 18px">
+    <li>GSTR-3B downloads</li>
+    <li>GST return locking</li>
+    <li>CA review actions</li>
+</ul>
+This helps in <b>compliance, transparency, and future audits</b>.
+</div>
+
+<!-- TABLE -->
+<div class="audit-card">
+
+<table class="audit-table">
+<thead>
+<tr>
+    <th>Return Month</th>
+    <th>Action</th>
+    <th>Performed By</th>
+    <th>Date & Time</th>
+</tr>
+</thead>
+<tbody>
+
+{% for log in logs %}
+<tr>
+    <td>
+        <strong>{{ log.return_month }}</strong>
+    </td>
+
+    <td>
+        {% if "DOWNLOAD" in log.action %}
+            <span class="badge badge-download">GSTR-3B Downloaded</span>
+        {% elif "LOCK" in log.action %}
+            <span class="badge badge-lock">GST Locked</span>
+        {% else %}
+            <span class="badge badge-view">{{ log.action }}</span>
+        {% endif %}
+    </td>
+
+    <td>
+        <span class="role">{{ log.user_role }}</span>
+    </td>
+
+    <td>
+        {{ log.action_time.strftime("%d %b %Y, %I:%M %p") }}
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="4" class="empty">
+        No GST audit activity recorded yet
+    </td>
+</tr>
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+
+{% endblock %}

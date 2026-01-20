@@ -62,6 +62,15 @@ input {
     padding: 20px;
     border-radius: 12px;
 }
+.credit-note {
+    display: none;
+    margin-top: 15px;
+    padding: 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 10px;
+    font-weight: 600;
+}
 </style>
 
 <div class="payment-wrapper">
@@ -81,6 +90,9 @@ input {
            value="{{ total_amount if total_amount else '' }}"
            placeholder="Enter amount">
 
+    <!-- Hidden transaction type -->
+    <input type="hidden" id="txnType" value="SALE">
+
     <div class="payment-grid">
         <div class="pay-btn" onclick="selectMode('Cash', this)">💵 Cash</div>
         <div class="pay-btn" onclick="selectMode('UPI', this)">📱 UPI</div>
@@ -88,13 +100,25 @@ input {
         <div class="pay-btn" onclick="selectMode('Credit', this)">🤝 Credit</div>
     </div>
 
-    <!-- UPI QR -->
+    <!-- CREDIT NOTE LABEL -->
+    <div id="creditNoteLabel" class="credit-note">
+        ⚠ This transaction will be saved as a Credit Note
+    </div>
+
+    <!-- ✅ STATIC REAL QR -->
     <div id="qrBox">
         <h4>Scan & Pay</h4>
-        <img id="qrImg" width="180">
+
+        <img src="/static/images/avani-phonepe-qr.jpg"
+             style="width:200px;border:1px solid #e5e7eb;border-radius:12px;">
+
         <p style="margin-top:10px;font-weight:600">
             ₹ <span id="qrAmount">0.00</span>
         </p>
+
+        <small style="color:#64748b">
+            PhonePe / GPay / Paytm
+        </small>
     </div>
 </div>
 
@@ -110,6 +134,8 @@ input {
         ₹ <span id="sAmount">0.00</span>
     </h2>
 
+    <p id="sTxnType" style="margin-top:10px;font-weight:700;color:#facc15"></p>
+
     <button class="btn-confirm" onclick="confirmPayment()">
         Confirm Payment & Print Receipt
     </button>
@@ -122,8 +148,20 @@ let mode = "";
 
 function selectMode(m, el) {
     mode = m;
-    document.querySelectorAll('.pay-btn').forEach(b => b.classList.remove('active'));
+
+    document.querySelectorAll('.pay-btn')
+        .forEach(b => b.classList.remove('active'));
     el.classList.add('active');
+
+    if (m === "Credit") {
+        document.getElementById("txnType").value = "CREDIT_NOTE";
+        document.getElementById("creditNoteLabel").style.display = "block";
+        document.getElementById("sTxnType").innerText = "CREDIT NOTE";
+    } else {
+        document.getElementById("txnType").value = "SALE";
+        document.getElementById("creditNoteLabel").style.display = "none";
+        document.getElementById("sTxnType").innerText = "";
+    }
 
     updateSummary();
 
@@ -144,15 +182,10 @@ function updateSummary() {
 
 function showQR() {
     const amt = document.getElementById("amount").value;
-    if (!amt) {
+    if (!amt || amt <= 0) {
         alert("Enter amount first");
         return;
     }
-    const vpa = "avani.oils@okicici";
-    const name = "Avani Oils";
-    const qr = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi://pay?pa=${vpa}&pn=${name}&am=${amt}&cu=INR`;
-
-    document.getElementById("qrImg").src = qr;
     document.getElementById("qrAmount").innerText = amt;
     document.getElementById("qrBox").style.display = "block";
 }
@@ -167,10 +200,10 @@ function confirmPayment() {
     }
 
     window.location.href =
-        `/generate-invoice?cust=${encodeURIComponent(customer)}&amt=${amount}&mode=${mode}`;
+        `/generate-invoice?cust=${encodeURIComponent(customer)}&amt=${amount}&mode=${mode}&sale_id={{ sale_id }}`;
 }
 
-// live update
+// Live update
 document.getElementById("customer").addEventListener("input", updateSummary);
 document.getElementById("amount").addEventListener("input", updateSummary);
 </script>

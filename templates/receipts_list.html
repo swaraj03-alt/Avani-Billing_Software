@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Receipts{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table th, .table td {
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    text-align: center;
+}
+
+.table th {
+    background: #f1f5f9;
+    font-weight: 700;
+}
+
+.badge-paid {
+    background: #dcfce7;
+    color: #166534;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.badge-due {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.view-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
+    font-weight: 600;
+}
+</style>
+
+<div class="card">
+    <h2>Receipts</h2>
+    <p style="color:#64748b;margin-top:4px">
+        All generated receipts (Cash / UPI / Card / Credit)
+    </p>
+
+    {% if receipts and receipts|length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Receipt No</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Amount (₹)</th>
+                <th>Payment Mode</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for r in receipts %}
+            <tr>
+                <td>{{ r.receipt_no }}</td>
+                <td>{{ r.created_at.strftime("%d-%m-%Y") }}</td>
+                <td>{{ r.customer_name }}</td>
+                <td>{{ "%.2f"|format(r.amount) }}</td>
+                <td>{{ r.payment_mode }}</td>
+                <td>
+                    {% if r.payment_status == "PAID" %}
+                        <span class="badge-paid">PAID</span>
+                    {% else %}
+                        <span class="badge-due">DUE</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/receipt/{{ r.id }}">
+                        <button class="view-btn">View</button>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">
+            No receipts found
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

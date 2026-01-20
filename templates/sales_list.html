@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Sales History{% endblock %}
+
+{% block content %}
+<style>
+.sale-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 22px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+}
+
+/* HEADER */
+.sale-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.sale-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+/* META */
+.sale-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 14px;
+}
+
+/* STATUS BADGES */
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: .3px;
+}
+
+.badge-paid {
+    background: #ecfdf5;
+    color: #15803d;
+}
+
+.badge-due {
+    background: #fff7ed;
+    color: #b45309;
+}
+
+.badge-pending {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+/* TABLE */
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.items-table th {
+    text-align: left;
+    padding: 8px;
+    color: #64748b;
+    font-weight: 600;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.items-table td {
+    padding: 8px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+/* TOTAL */
+.sale-total {
+    text-align: right;
+    font-weight: 800;
+    margin-top: 10px;
+    font-size: 0.95rem;
+}
+</style>
+
+<h1 style="margin-bottom:4px">💰 Sales History</h1>
+<p style="color:#64748b;margin-bottom:22px">
+    All completed and pending sales
+</p>
+
+{% for s in sales %}
+<div class="sale-card">
+
+    <!-- HEADER -->
+    <div class="sale-header">
+        <h3>Invoice #{{ s.id }}</h3>
+
+        {% if s.payment_status == "PAID" %}
+            <span class="badge badge-paid">PAID</span>
+        {% elif s.payment_status == "DUE" %}
+            <span class="badge badge-due">DUE</span>
+        {% else %}
+            <span class="badge badge-pending">PENDING</span>
+        {% endif %}
+    </div>
+
+    <!-- META -->
+    <div class="sale-meta">
+        <span>{{ s.created_at }} • {{ s.customer }}</span>
+        <span>Invoice Total: ₹ {{ s.total_amount }}</span>
+    </div>
+
+    <!-- ITEMS -->
+    <table class="items-table">
+        <thead>
+        <tr>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Price</th>
+            <th style="text-align:right">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i in s["items"] %}
+        <tr>
+            <td>
+                {% if i.bottle_size_ml %}
+                    {{ i.product }} ({{ i.bottle_size_ml }} ml)
+                {% else %}
+                    {{ i.product }} ({{ i.unit }})
+                {% endif %}
+            </td>
+            <td>{{ i.quantity }}</td>
+            <td>₹ {{ i.price }}</td>
+            <td style="text-align:right">₹ {{ i.quantity * i.price }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="sale-total">
+        Grand Total: ₹ {{ s.total_amount }}
+    </div>
+
+</div>
+{% else %}
+<p>No sales found.</p>
+{% endfor %}
+
+{% endblock %}

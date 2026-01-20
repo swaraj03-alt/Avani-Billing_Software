@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @media print {
+    button {
+        display: none;
+    }
+}
+
+        body { font-family: Arial; padding: 30px; }
+        h2 { text-align: center; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 10px;
+            text-align: right;
+        }
+        th { background: #f0f0f0; }
+        td:first-child, th:first-child {
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<h2>GSTR-3B Summary</h2>
+<p><strong>Date:</strong> {{ date }}</p>
+<p><strong>Business:</strong> Avani Oil</p>
+
+<table>
+<tr>
+    <th>Description</th>
+    <th>Amount (₹)</th>
+</tr>
+
+<tr>
+    <td>Total Taxable Sales</td>
+    <td>{{ "%.2f"|format(taxable) }}</td>
+</tr>
+
+<tr>
+    <td>CGST</td>
+    <td>{{ "%.2f"|format(cgst) }}</td>
+</tr>
+
+<tr>
+    <td>SGST</td>
+    <td>{{ "%.2f"|format(sgst) }}</td>
+</tr>
+
+<tr>
+    <td>IGST</td>
+    <td>{{ "%.2f"|format(igst) }}</td>
+</tr>
+
+<tr>
+    <th>Total Output GST</th>
+    <th>{{ "%.2f"|format(output_gst) }}</th>
+</tr>
+
+<tr>
+    <td>Eligible ITC (from GSTR-2B)</td>
+    <td>{{ "%.2f"|format(itc) }}</td>
+</tr>
+
+<tr>
+    <th>Net GST Payable</th>
+    <th>{{ "%.2f"|format(net_gst) }}</th>
+</tr>
+
+</table>
+
+<p style="margin-top:30px;font-size:12px;">
+    * This summary is system-generated and intended for CA filing reference only.
+</p>
+<div style="text-align:right; margin-bottom:20px;">
+    <button onclick="window.print()" style="
+        padding:10px 16px;
+        background:#2e7d32;
+        color:white;
+        border:none;
+        border-radius:6px;
+        cursor:pointer;
+        font-weight:600;
+    ">
+        🖨 Print
+    </button>
+</div>
+
+</body>
+</html>

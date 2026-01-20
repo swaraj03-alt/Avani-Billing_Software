@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Bank Accounts{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background:white;
+    padding:24px;
+    border-radius:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+table {
+    width:100%;
+    border-collapse:collapse;
+}
+th, td {
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+}
+th { background:#f8fafc; text-align:left; }
+</style>
+
+<h2>🏦 Bank Accounts</h2>
+<div class="card" style="margin-bottom:30px">
+<h3>Add Bank Account</h3>
+
+<form method="POST" action="/add-bank-account">
+<input name="bank_name" placeholder="Bank Name" required><br><br>
+<input name="account_name" placeholder="Account Holder Name" required><br><br>
+<input name="account_no" placeholder="Account Number" required><br><br>
+<input name="ifsc" placeholder="IFSC Code" required><br><br>
+<input name="branch" placeholder="Branch" required><br><br>
+
+<button>Add Bank</button>
+</form>
+</div>
+
+<div class="card">
+<table>
+<tr>
+    <th>Bank</th>
+    <th>Account Name</th>
+    <th>Account No</th>
+    <th>IFSC</th>
+    <th>Branch</th>
+</tr>
+
+{% for b in banks %}
+<tr>
+    <td>{{ b.bank_name }}</td>
+    <td>{{ b.account_name }}</td>
+    <td>{{ b.account_no }}</td>
+    <td>{{ b.ifsc }}</td>
+    <td>{{ b.branch }}</td>
+</tr>
+{% else %}
+<tr><td colspan="5">No bank accounts found</td></tr>
+{% endfor %}
+</table>
+</div>
+
+{% endblock %}

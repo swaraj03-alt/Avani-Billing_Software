@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block title %}Settle Credit{% endblock %}
+
+{% block content %}
+<style>
+.settle-wrapper {
+    max-width: 900px;
+    margin: 30px auto;
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 25px;
+}
+@media (max-width: 992px) {
+    .settle-wrapper { grid-template-columns: 1fr; }
+}
+
+.card {
+    background: white;
+    padding: 28px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+label {
+    font-weight: 600;
+    margin-top: 15px;
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    margin-top: 6px;
+}
+
+.payment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.pay-btn {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.pay-btn.active {
+    border-color: #16a34a;
+    background: #dcfce7;
+}
+
+.btn-confirm {
+    width: 100%;
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 16px;
+    border-radius: 10px;
+    font-weight: 700;
+    margin-top: 20px;
+}
+
+.note {
+    margin-top: 15px;
+    background: #fef3c7;
+    color: #92400e;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.summary {
+    background: #1e293b;
+    color: white;
+}
+
+.summary-value {
+    font-size: 1.6rem;
+    color: #facc15;
+    font-weight: 700;
+}
+</style>
+
+<div class="settle-wrapper">
+
+<!-- LEFT : FORM -->
+<form method="POST" class="card">
+    <h2>Settle Credit Payment</h2>
+
+    <label>Receipt No</label>
+    <input value="{{ r.receipt_no }}" readonly>
+
+    <label>Customer</label>
+    <input value="{{ r.customer_name }}" readonly>
+
+    <label>Total Due Amount (₹)</label>
+    <input id="dueAmount" value="{{ r.amount }}" readonly>
+
+    <!-- hidden field sent to backend -->
+    <input type="hidden" name="payment_mode" id="payment_mode">
+
+    <label>Payment Mode</label>
+    <div class="payment-grid">
+        <div class="pay-btn" onclick="selectMode('Cash', this)">💵 Cash</div>
+        <div class="pay-btn" onclick="selectMode('UPI', this)">📱 UPI</div>
+        <div class="pay-btn" onclick="selectMode('Card', this)">💳 Card</div>
+    </div>
+
+    <div class="note">
+        ⚠ This will mark the credit as PAID
+    </div>
+
+    <button type="submit" class="btn-confirm">
+        Confirm & Settle Credit
+    </button>
+</form>
+
+<!-- RIGHT : SUMMARY -->
+<div class="card summary">
+    <h3>Settlement Summary</h3>
+
+    <p>Outstanding Amount</p>
+    <div class="summary-value">
+        ₹ {{ r.amount }}
+    </div>
+</div>
+
+</div>
+
+<script>
+function selectMode(mode, el) {
+    document.getElementById("payment_mode").value = mode;
+
+    document.querySelectorAll(".pay-btn")
+        .forEach(b => b.classList.remove("active"));
+
+    el.classList.add("active");
+}
+</script>
+
+{% endblock %}

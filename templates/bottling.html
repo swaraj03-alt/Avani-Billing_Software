@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Bottling{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background:white;
+    padding:28px;
+    border-radius:16px;
+    max-width:800px;
+    margin:auto;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+.full { grid-column:span 2; }
+label { font-weight:600; font-size:0.85rem; }
+input, select {
+    padding:12px;
+    border-radius:8px;
+    border:1.5px solid #e2e8f0;
+}
+button {
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    font-weight:700;
+    width:100%;
+}
+</style>
+
+<div class="card">
+<h2>🧴 Bottling Entry</h2>
+
+<form method="POST" action="/save-bottling">
+<div class="grid">
+
+<div>
+<label>Container</label>
+<select name="container_code" required>
+    {% for c in containers %}
+        <option value="{{ c.container_code }}">{{ c.container_code }} ({{ c.oil_type }} - {{ c.current_qty_ltr }} L)</option>
+    {% endfor %}
+</select>
+</div>
+
+<div>
+<label>Oil Type</label>
+<select name="oil_type" required>
+    {% for c in containers %}
+        <option value="{{ c.oil_type }}">{{ c.oil_type }}</option>
+    {% endfor %}
+</select>
+</div>
+
+<div>
+<label>Bottle Size (ml)</label>
+<select name="bottle_size" required>
+    <option value="200">200 ml</option>
+    <option value="500">500 ml</option>
+    <option value="1000">1 Litre</option>
+    <option value="2000">2 Litre</option>
+    <option value="5000">5 Litre</option>
+    <option value="10000">10 Litre</option>
+    <option value="15000">15 Litre</option>
+    <option value="20000">20 Litre</option>
+    
+
+</select>
+</div>
+
+<div>
+<label>Quantity (bottles)</label>
+<input type="number" name="quantity" required min="1">
+</div>
+
+<div class="full">
+<button>Save Bottling</button>
+</div>
+
+</div>
+</form>
+</div>
+
+{% endblock %}

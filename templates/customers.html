@@ -1,86 +1,36 @@
 {% extends "base.html" %}
+
 {% block title %}Customers{% endblock %}
 
 {% block content %}
 <style>
-.customer-container {
-    display: grid;
-    grid-template-columns: 420px 1fr;
-    gap: 30px;
-}
-
-@media(max-width: 992px) {
-    .customer-container {
-        grid-template-columns: 1fr;
-    }
-}
-
-.card {
+.customers-container {
     background: white;
+    padding: 26px;
     border-radius: 16px;
-    padding: 25px;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.06);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.card h3 {
-    margin-top: 0;
-    font-weight: 800;
-    color: #1e293b;
+.customers-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #475569;
+.customers-header h2 {
+    margin: 0;
+    font-size: 1.4rem;
 }
 
-input, select, textarea {
-    width: 100%;
-    padding: 11px;
-    border-radius: 8px;
-    border: 1.5px solid #e2e8f0;
-    font-size: 0.95rem;
-}
-
-input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: var(--brand-green);
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
-}
-
-.full {
-    grid-column: span 2;
-}
-
-@media(max-width: 576px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    .full {
-        grid-column: span 1;
-    }
-}
-
-.btn-primary {
-    background: var(--brand-green);
+.btn-print {
+    background: #334155;
     color: white;
-    padding: 14px;
     border: none;
+    padding: 10px 14px;
     border-radius: 10px;
-    font-weight: 700;
-    width: 100%;
-    margin-top: 18px;
+    font-weight: 600;
     cursor: pointer;
-}
-
-/* CUSTOMER LIST */
-.table-wrapper {
-    overflow-x: auto;
 }
 
 table {
@@ -88,129 +38,63 @@ table {
     border-collapse: collapse;
 }
 
-th {
-    text-align: left;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    color: #64748b;
-    border-bottom: 1px solid #e5e7eb;
-    padding: 12px;
-}
-
-td {
-    padding: 12px;
-    border-bottom: 1px solid #f1f5f9;
-    font-size: 0.9rem;
-}
-
-.badge {
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    font-weight: 700;
-}
-
-.badge-gst {
-    background: #ecfdf5;
-    color: #16a34a;
-}
-
-.badge-non {
+thead {
     background: #f1f5f9;
-    color: #334155;
+}
+
+th, td {
+    padding: 12px 14px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #475569;
+}
+
+.empty {
+    text-align: center;
+    padding: 30px;
+    color: #94a3b8;
+    font-weight: 600;
 }
 </style>
 
-<div class="customer-container">
+<div class="customers-container">
 
-<!-- LEFT : ADD CUSTOMER -->
-<div class="card">
-    <h3>Add Customer</h3>
-
-    <form method="POST" action="/save-customer">
-        <div class="form-grid">
-
-            <div class="full">
-                <label>Customer Name *</label>
-                <input type="text" name="name" required placeholder="Customer full name">
-            </div>
-
-            <div>
-                <label>Mobile</label>
-                <input type="text" name="mobile" placeholder="10 digit number">
-            </div>
-
-            <div>
-                <label>Email</label>
-                <input type="email" name="email">
-            </div>
-
-            <div class="full">
-                <label>Billing Address</label>
-                <textarea rows="2" name="address"></textarea>
-            </div>
-
-            <div>
-                <label>GST Type</label>
-                <select name="gst_type">
-                    <option>GST Registered</option>
-                    <option>Unregistered</option>
-                </select>
-            </div>
-
-            <div>
-                <label>GSTIN</label>
-                <input type="text" name="gstin" placeholder="27XXXXXXXXX1Z5">
-            </div>
-
-            <div>
-                <label>Opening Balance (₹)</label>
-                <input type="number" name="opening_balance" value="0">
-            </div>
-
-            <div>
-                <label>Credit Limit (₹)</label>
-                <input type="number" name="credit_limit" value="0">
-            </div>
-
-        </div>
-
-        <button class="btn-primary">Save Customer</button>
-    </form>
-</div>
-
-<!-- RIGHT : CUSTOMER LIST -->
-<div class="card">
-    <h3>Customer List</h3>
-
-    <div class="table-wrapper">
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Mobile</th>
-                    <th>GST</th>
-                    <th>Balance</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Static demo rows (replace with DB later) -->
-                <tr>
-                    <td>Walk-in Customer</td>
-                    <td>-</td>
-                    <td><span class="badge badge-non">Non-GST</span></td>
-                    <td>₹ 0</td>
-                </tr>
-                <tr>
-                    <td>Shree Traders</td>
-                    <td>9876543210</td>
-                    <td><span class="badge badge-gst">GST</span></td>
-                    <td>₹ 12,450</td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="customers-header">
+        <h2>Customers</h2>
+        <button class="btn-print" onclick="window.print()">🖨 Print</button>
     </div>
-</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Customer Name</th>
+                <th>Mobile</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if customers %}
+                {% for c in customers %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ c.name }}</td>
+                    <td>{{ c.mobile }}</td>
+                    <td>{{ c.created_at }}</td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="4" class="empty">No customers found</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
 
 </div>
 {% endblock %}

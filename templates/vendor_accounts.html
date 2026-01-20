@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}Vendor Accounts{% endblock %}
+
+{% block content %}
+<style>
+.card{
+    background:#fff;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    margin-bottom:24px;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:0.9rem;
+}
+th,td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+}
+th{
+    background:#f8fafc;
+    text-align:left;
+}
+.due{color:#dc2626;font-weight:700;}
+.paid{color:#16a34a;font-weight:700;}
+.badge{
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:0.75rem;
+    font-weight:700;
+}
+.badge-paid{background:#dcfce7;color:#15803d;}
+.badge-due{background:#fee2e2;color:#b91c1c;}
+
+input,select{
+    padding:10px;
+    border-radius:8px;
+    border:1.5px solid #e2e8f0;
+    width:100%;
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+.full{grid-column:span 2;}
+button{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:12px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+}
+.summary-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+.summary-box{
+    background:#f8fafc;
+    padding:16px;
+    border-radius:12px;
+}
+.summary-title{
+    font-size:0.8rem;
+    color:#64748b;
+}
+.summary-value{
+    font-size:1.4rem;
+    font-weight:900;
+}
+</style>
+
+<h2>🏪 Vendor Accounts</h2>
+
+<!-- ================= OUTSTANDING VENDORS ================= -->
+<div class="card">
+<h3>📌 Outstanding Vendors</h3>
+
+<table>
+<tr>
+    <th>Vendor</th>
+    <th>Due Amount</th>
+    <th>Action</th>
+</tr>
+{% for v in vendors %}
+<tr>
+    <td>{{ v.vendor_name }}</td>
+    <td class="due">₹ {{ "%.2f"|format(v.due_amount) }}</td>
+    <td>
+        <a href="?vendor={{ v.vendor_name }}" style="color:#2563eb;font-weight:600">
+            View Ledger →
+        </a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+{% if selected_vendor %}
+
+<!-- ================= VENDOR SUMMARY ================= -->
+<div class="card">
+<h3>📊 Vendor Summary – {{ selected_vendor }}</h3>
+
+<div class="summary-grid">
+    <div class="summary-box">
+        <div class="summary-title">Total Purchase</div>
+        <div class="summary-value">
+            ₹ {{ "%.2f"|format(total_debit) }}
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-title">Total Paid</div>
+        <div class="summary-value paid">
+            ₹ {{ "%.2f"|format(total_credit) }}
+        </div>
+    </div>
+
+    <div class="summary-box">
+        <div class="summary-title">Remaining Due</div>
+        <div class="summary-value due">
+            ₹ {{ "%.2f"|format(remaining_due) }}
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- ================= PAY VENDOR ================= -->
+<div class="card">
+<h3>💳 Pay Vendor – {{ selected_vendor }}</h3>
+
+<form method="POST" action="/pay-vendor">
+<input type="hidden" name="vendor_name" value="{{ selected_vendor }}">
+
+<div class="form-grid">
+
+    <div>
+        <label>Amount (Max ₹ {{ "%.2f"|format(remaining_due) }})</label>
+        <input
+            name="amount"
+            type="number"
+            step="0.01"
+            min="1"
+            max="{{ remaining_due }}"
+            required
+        >
+    </div>
+
+    <div>
+        <label>Payment Mode</label>
+        <select name="payment_mode" id="paymentMode" onchange="toggleMode()" required>
+            <option value="">Select</option>
+            <option value="CASH">Cash</option>
+            <option value="BANK">Bank</option>
+            <option value="UPI">UPI</option>
+        </select>
+    </div>
+
+    <!-- BANK -->
+    <div id="bankBox" style="display:none">
+        <label>Bank Account</label>
+        <select name="bank_account">
+            {% for b in banks %}
+            <option value="{{ b.bank_name }} - {{ b.account_no[-4:] }}">
+                {{ b.bank_name }} • {{ b.account_no[-4:] }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- UPI -->
+    <div id="upiBox" style="display:none">
+        <label>UPI ID</label>
+        <input
+            type="text"
+            name="upi_id"
+            placeholder="example@upi"
+        >
+    </div>
+
+    <div class="full">
+        <button>Pay Vendor</button>
+    </div>
+
+</div>
+</form>
+</div>
+
+<!-- ================= LEDGER ================= -->
+<div class="card">
+<h3>📒 Ledger – {{ selected_vendor }}</h3>
+
+<table>
+<tr>
+    <th>Date</th>
+    <th>Reference</th>
+    <th>Debit</th>
+    <th>Credit</th>
+    <th>Mode</th>
+    <th>Status</th>
+    <th>Balance</th>
+</tr>
+
+{% for l in ledger %}
+<tr>
+    <td>{{ l.date }}</td>
+    <td>{{ l.ref or "-" }}</td>
+    <td>₹ {{ "%.2f"|format(l.debit) }}</td>
+    <td>₹ {{ "%.2f"|format(l.credit) }}</td>
+    <td>{{ l.mode or "-" }}</td>
+    <td>
+        {% if l.payment_status == "PAID" %}
+            <span class="badge badge-paid">PAID</span>
+        {% else %}
+            <span class="badge badge-due">DUE</span>
+        {% endif %}
+    </td>
+    <td>
+        {% if l.balance > 0 %}
+            <span class="due">₹ {{ "%.2f"|format(l.balance) }}</span>
+        {% else %}
+            <span class="paid">₹ 0.00</span>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+{% endif %}
+
+<script>
+function toggleMode(){
+    const mode = document.getElementById("paymentMode").value;
+    document.getElementById("bankBox").style.display = mode === "BANK" ? "block" : "none";
+    document.getElementById("upiBox").style.display = mode === "UPI" ? "block" : "none";
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+{% block title %}Cash in Hand{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background: white;
+    padding: 26px;
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    margin-bottom: 28px;
+}
+
+.summary {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.balance-box {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.balance-box h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #166534;
+}
+
+.balance-box .amount {
+    margin-top: 8px;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #16a34a;
+}
+
+form.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.full {
+    grid-column: span 2;
+}
+
+label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: #334155;
+}
+
+input, select {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1.5px solid #e2e8f0;
+    width: 100%;
+}
+
+button {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+    background: #f8fafc;
+    text-align: left;
+}
+
+.credit { color: #16a34a; font-weight: 700; }
+.debit { color: #dc2626; font-weight: 700; }
+</style>
+
+<h2>💵 Cash in Hand</h2>
+
+<!-- 🔹 CASH SUMMARY -->
+<div class="card summary">
+    <div class="balance-box">
+        <h3>Current Cash Balance</h3>
+        <div class="amount">
+            ₹ {{ "%.2f"|format(cash_balance if cash_balance is defined else 0) }}
+        </div>
+    </div>
+
+    <div class="balance-box" style="background:#fff7ed;border-color:#fed7aa">
+        <h3>Last Updated</h3>
+        <div class="amount" style="color:#c2410c;font-size:1.1rem">
+            {{ last_updated if last_updated is defined else "—" }}
+        </div>
+    </div>
+</div>
+
+<!-- 🔹 ADD / ADJUST CASH -->
+<div class="card">
+<h3>➕ Add / Adjust Cash</h3>
+
+<form method="POST" action="/cash-adjust" class="grid">
+
+<div>
+<label>Amount</label>
+<input type="number" step="0.01" name="amount" required>
+</div>
+
+<div>
+<label>Type</label>
+<select name="type" required>
+    <option value="IN">Cash In</option>
+    <option value="OUT">Cash Out</option>
+</select>
+</div>
+
+<div class="full">
+<label>Remarks</label>
+<input name="remarks" placeholder="Eg: Opening cash, Expense, Withdrawal">
+</div>
+
+<div class="full">
+<button>Save Entry</button>
+</div>
+
+</form>
+</div>
+
+<!-- 🔹 CASH LEDGER -->
+<div class="card">
+<h3>📒 Cash Ledger</h3>
+
+<table>
+<tr>
+    <th>Date</th>
+    <th>Remarks</th>
+    <th>Debit</th>
+    <th>Credit</th>
+</tr>
+
+{% for c in ledger %}
+<tr>
+    <td>{{ c.date }}</td>
+    <td>{{ c.remarks }}</td>
+    <td class="debit">
+        {% if c.type == 'OUT' %}₹ {{ "%.2f"|format(c.amount) }}{% else %}-{% endif %}
+    </td>
+    <td class="credit">
+        {% if c.type == 'IN' %}₹ {{ "%.2f"|format(c.amount) }}{% else %}-{% endif %}
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="4">No cash transactions found</td>
+</tr>
+{% endfor %}
+</table>
+</div>
+
+{% endblock %}

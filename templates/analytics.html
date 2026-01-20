@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}Sales Analytics{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background: white;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.controls button {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    background: #f8fafc;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.controls button.active {
+    background: #16a34a;
+    color: white;
+    border-color: #16a34a;
+}
+</style>
+
+<div class="card">
+    <h2>📊 Sales Analytics</h2>
+
+    <div class="controls">
+<button onclick="loadData('daily', this)">Daily</button>
+<button onclick="loadData('weekly', this)">Weekly</button>
+<button onclick="loadData('monthly', this)" class="active">Monthly</button>
+
+
+        <button onclick="toggleChart()">Paid vs Credit</button>
+        <button onclick="downloadChart()">Download</button>
+    </div>
+
+    <canvas id="salesChart" height="110"></canvas>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let chart;
+let chartType = "line";
+
+function loadData(view, el) {
+    document.querySelectorAll(".controls button")
+        .forEach(b => b.classList.remove("active"));
+    el.classList.add("active");
+
+    fetch(`/api/sales-analytics?view=${view}`)
+        .then(res => res.json())
+        .then(data => renderChart(data));
+}
+
+
+function renderChart(data) {
+    const ctx = document.getElementById("salesChart");
+
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+        type: chartType,
+        data: {
+            labels: data.labels,
+            datasets: [
+                {
+                    label: "Paid Sales",
+                    data: data.paid,
+                    borderColor: "#16a34a",
+                    backgroundColor: "rgba(22,163,74,0.2)"
+                },
+                {
+                    label: "Credit Sales",
+                    data: data.credit,
+                    borderColor: "#dc2626",
+                    backgroundColor: "rgba(220,38,38,0.2)"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: v => "₹ " + v
+                    }
+                }
+            }
+        }
+    });
+}
+
+function toggleChart() {
+    chartType = chartType === "line" ? "bar" : "line";
+    loadData("monthly");
+}
+
+function downloadChart() {
+    const link = document.createElement("a");
+    link.download = "sales-analytics.png";
+    link.href = document.getElementById("salesChart").toDataURL();
+    link.click();
+}
+
+// initial load
+loadData("monthly");
+</script>
+
+{% endblock %}

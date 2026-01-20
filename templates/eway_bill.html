@@ -8,94 +8,65 @@
     grid-template-columns: 1fr 420px;
     gap: 30px;
 }
-
 @media(max-width: 992px) {
-    .eway-container {
-        grid-template-columns: 1fr;
-    }
+    .eway-container { grid-template-columns: 1fr; }
 }
-
 .card {
     background: white;
     border-radius: 16px;
     box-shadow: 0 6px 12px rgba(0,0,0,0.06);
-    padding: 25px;
+    padding: 26px;
 }
-
 .card h3 {
     margin-top: 0;
     font-weight: 800;
     color: #1e293b;
 }
-
 .section-title {
     font-weight: 700;
-    margin-bottom: 15px;
+    margin-bottom: 14px;
     color: #334155;
 }
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 18px;
 }
-
-.full {
-    grid-column: span 2;
-}
-
+.full { grid-column: span 2; }
 label {
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     color: #475569;
 }
-
 input, select {
     padding: 11px;
     border-radius: 8px;
     border: 1.5px solid #e2e8f0;
     font-size: 0.95rem;
 }
-
-input:focus, select:focus {
-    outline: none;
-    border-color: var(--brand-green);
-}
-
 .preview-box {
     background: #f8fafc;
     border: 1px dashed #cbd5e1;
     border-radius: 12px;
     padding: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 16px;
 }
-
 .preview-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     margin-bottom: 6px;
 }
-
-.preview-row span:first-child {
-    color: #64748b;
-}
-
-.preview-row span:last-child {
-    font-weight: 700;
-}
-
+.preview-row span:last-child { font-weight: 700; }
 .btn-primary {
-    background: var(--brand-green);
+    background: #16a34a;
     color: white;
     border: none;
     padding: 14px;
     border-radius: 10px;
     font-weight: 700;
-    cursor: pointer;
     width: 100%;
 }
-
 .btn-secondary {
     background: #334155;
     color: white;
@@ -103,57 +74,76 @@ input:focus, select:focus {
     padding: 14px;
     border-radius: 10px;
     font-weight: 700;
-    cursor: pointer;
     width: 100%;
     margin-top: 10px;
+}
+.warning {
+    background: #fef3c7;
+    color: #92400e;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+.status {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0f766e;
 }
 </style>
 
 <div class="eway-container">
 
-<!-- LEFT : E-WAY BILL ENTRY -->
+<!-- LEFT -->
 <div class="card">
     <h3>Generate E-Way Bill</h3>
 
-    <div class="section-title">Invoice Details (Auto)</div>
+    <div class="warning">
+        ⚠ E-Way Bill is mandatory if invoice value exceeds ₹50,000
+    </div>
 
+    <div class="section-title">Invoice Details (Auto-filled)</div>
     <div class="form-grid">
         <div>
             <label>Invoice No</label>
-            <input type="text" value="INV-1024" readonly>
+            <input value="{{ invoice_no or 'Auto from Sale' }}" readonly>
         </div>
-
         <div>
             <label>Invoice Date</label>
-            <input type="text" value="02-Jan-2026" readonly>
+            <input value="{{ invoice_date or 'Auto' }}" readonly>
         </div>
-
         <div>
             <label>Supplier GSTIN</label>
-            <input type="text" value="27XXXXX1234Z5" readonly>
+            <input value="27DARPM3874G1Z3" readonly>
         </div>
-
         <div>
             <label>Customer GSTIN</label>
-            <input type="text" value="27YYYYY5678X9" readonly>
+            <input placeholder="Optional">
         </div>
-
         <div class="full">
             <label>Place of Supply</label>
-            <input type="text" value="Maharashtra" readonly>
+            <input value="Maharashtra" readonly>
         </div>
-
         <div class="full">
             <label>Total Invoice Value (₹)</label>
-            <input type="text" value="₹ 78,450.00" readonly>
+            <input value="{{ invoice_total or '0.00' }}" readonly>
         </div>
     </div>
 
     <hr style="margin:25px 0">
 
-    <div class="section-title">Transport Details (Part-B)</div>
-
+    <div class="section-title">Movement Details (Part-B)</div>
     <div class="form-grid">
+        <div>
+            <label>Reason for Transport</label>
+            <select>
+                <option>Supply</option>
+                <option>Return</option>
+                <option>Job Work</option>
+                <option>Transfer</option>
+            </select>
+        </div>
         <div>
             <label>Transport Mode</label>
             <select>
@@ -163,61 +153,45 @@ input:focus, select:focus {
                 <option>Ship</option>
             </select>
         </div>
-
         <div>
             <label>Vehicle Number</label>
-            <input type="text" placeholder="MH12AB1234">
+            <input placeholder="MH12AB1234">
         </div>
-
-        <div>
-            <label>Transporter Name</label>
-            <input type="text" placeholder="Self / XYZ Transport">
-        </div>
-
         <div>
             <label>Distance (KM)</label>
             <input type="number" placeholder="120">
         </div>
+        <div class="full">
+            <label>Transporter Name</label>
+            <input placeholder="Self / XYZ Transport">
+        </div>
     </div>
 
-    <button class="btn-primary" style="margin-top:25px">
-        Save E-Way Bill Details
+        <button type="submit" class="btn-primary">
+        Save as Draft
     </button>
+
 </div>
 
-<!-- RIGHT : E-WAY BILL PREVIEW -->
+<!-- RIGHT -->
 <div class="card">
     <h3>E-Way Bill Summary</h3>
+    <div class="status">Status: Draft</div>
 
     <div class="preview-box">
-        <div class="preview-row">
-            <span>Invoice No</span>
-            <span>INV-1024</span>
-        </div>
-        <div class="preview-row">
-            <span>Invoice Value</span>
-            <span>₹ 78,450</span>
-        </div>
-        <div class="preview-row">
-            <span>Transport Mode</span>
-            <span>Road</span>
-        </div>
-        <div class="preview-row">
-            <span>Vehicle No</span>
-            <span>MH12AB1234</span>
-        </div>
-        <div class="preview-row">
-            <span>Distance</span>
-            <span>120 KM</span>
-        </div>
+        <div class="preview-row"><span>Invoice No</span><span>{{ invoice_no or '—' }}</span></div>
+        <div class="preview-row"><span>Invoice Value</span><span>₹ {{ invoice_total or '0.00' }}</span></div>
+        <div class="preview-row"><span>Transport Mode</span><span>Road</span></div>
+        <div class="preview-row"><span>Vehicle No</span><span>—</span></div>
+        <div class="preview-row"><span>Distance</span><span>— KM</span></div>
     </div>
 
     <button class="btn-secondary">
         Copy Details for Govt Portal
     </button>
 
-    <small style="display:block;margin-top:12px;color:#64748b;font-size:0.8rem">
-        * Generate final E-Way Bill on govt portal using copied details
+    <small style="display:block;margin-top:12px;color:#64748b;font-size:0.78rem">
+        * Paste these details into https://ewaybillgst.gov.in to generate final E-Way Bill
     </small>
 </div>
 

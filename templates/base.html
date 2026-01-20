@@ -175,7 +175,7 @@ body {
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="sidebar-logo">
-        <h2>AVANI OIL</h2>
+        <h2>Avani Wood Cold Pressed Oil & Natural Store</h2>
     </div>
 
     <nav class="sidebar-nav">
@@ -186,26 +186,45 @@ body {
             <a href="/sale" class="menu-main">💰 Sale</a>
             <span class="menu-arrow" onclick="toggleMenu(this)">▾</span>
             <div class="submenu">
-                <a href="/customers">Customers</a>
-                <a href="/items">Items</a>
+<!--                <a href="/customers">Customers</a>-->
+<!--                <a href="/items">Items</a>-->
                 <a href="/quotations">Quotations</a>
-                <a href="/sales-orders">Sales Orders</a>
-                <a href="/delivery-challan">Delivery Challans</a>
-                <a href="/sale">Invoices</a>
-                <a href="/payments">Payments Received</a>
+<!--                <a href="/sales-orders">Sales Orders</a>-->
+<!--                <a href="/sale">Invoices</a>-->
+<!--                <a href="/payments">Payments Received</a>-->
                 <a href="/credit-notes">Credit Notes</a>
-                <a href="/sales-reports">Sales Reports</a>
+                <a href="/settle-credit-notes">Settle Credits</a>
+                <a href="/analytics">Analytics</a>
+
             </div>
         </div>
 
         <a href="/purchase">🛒 Purchase</a>
-        <a href="/payments">💸 Payments</a>
-        <a href="/generate-invoice">📑 Receipts</a>
+        <a href="/purchase-list">📦 Purchase List</a>
+        <a href="/vendor-accounts" class="sidebar-link">🏪 Vendor Accounts</a>
+            <!-- CASH & BANK -->
+    <div class="menu-item">
+        <a href="javascript:void(0)" class="menu-main">🏦 Cash & Bank</a>
+        <span class="menu-arrow" onclick="toggleMenu(this)">▾</span>
+
+        <div class="submenu">
+            <a href="/bank-accounts">🏛️ Bank Accounts <span style="float:right">＋</span></a>
+            <a href="/cash-in-hand">💵 Cash in Hand <span style="float:right">＋</span></a>
+            <a href="/cheques">🧾 Cheques</a>
+         </div>
+    </div>
+
+
         <a href="/production">🏭 Production</a>
+        <a href="/bottling">🧴Bottling</a>
+        <a href="/finished-stock">📊Rack Stock</a>
+        <a href="/payments">💸 Payments</a>
+        <a href="/receipts">📑 Receipts</a>
         <a href="/eway-bill">🚚 E-Way Bill</a>
         <a href="/gst-return">🏦 GST Return</a>
         <a href="/gstr-2a">🔍 GSTR-2A</a>
         <a href="/gstr-2b">🔎 GSTR-2B</a>
+        <a href="/gst-audit">🕵️ GST Audit Logs</a>
         <a href="/reconciliation">⚖️ Reconciliation</a>
     </nav>
 
@@ -216,7 +235,7 @@ body {
 <main class="content">
     <header class="top-nav">
         <span class="hamburger" onclick="toggleSidebar()">☰</span>
-        <div>Welcome back, <strong>Avani Oil</strong></div>
+        <div>Welcome back, <strong>Avani Wood Cold Pressed Oil & Natural Store</strong></div>
     </header>
 
     <div class="page-wrapper">

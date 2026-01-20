@@ -1,10 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Reconciliation{% endblock %}
+{% block title %}GST Reconciliation{% endblock %}
 
 {% block content %}
 <style>
-/* ================= RECONCILIATION ================= */
-
 .page-header {
     margin-bottom: 25px;
 }
@@ -20,36 +18,10 @@
     margin-top: 4px;
 }
 
-/* TABS */
-.tabs {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 25px;
-}
-
-.tab {
-    padding: 10px 18px;
-    border-radius: 10px;
-    background: #f1f5f9;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.tab.active {
-    background: #2e7d32;
-    color: white;
-}
-
-.tab:hover {
-    background: #e2e8f0;
-}
-
-/* SUMMARY CARDS */
+/* SUMMARY */
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     margin-bottom: 30px;
 }
@@ -64,13 +36,11 @@
 .summary-card h4 {
     font-size: 0.85rem;
     color: #64748b;
-    margin: 0;
 }
 
 .summary-card p {
     font-size: 1.6rem;
     font-weight: 800;
-    margin: 8px 0 0;
 }
 
 /* TABLE */
@@ -92,9 +62,9 @@ thead {
 
 th, td {
     padding: 14px;
-    text-align: left;
     font-size: 0.9rem;
     border-bottom: 1px solid #e2e8f0;
+    text-align: left;
 }
 
 th {
@@ -102,60 +72,53 @@ th {
     color: #475569;
 }
 
-/* STATUS */
-.status {
+/* STATUS BADGES */
+.badge {
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: 999px;
     font-size: 0.75rem;
     font-weight: 700;
-    display: inline-block;
 }
 
 .matched { background: #dcfce7; color: #15803d; }
 .mismatch { background: #fee2e2; color: #b91c1c; }
 .missing { background: #fef3c7; color: #92400e; }
 
-/* ACTION */
-.action-btn {
-    padding: 6px 10px;
-    font-size: 0.8rem;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-    background: #f8fafc;
-    cursor: pointer;
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #64748b;
 }
 </style>
 
 <!-- HEADER -->
 <div class="page-header">
-    <h2>GST Reconciliation</h2>
-    <p>Match your records with GST portal data to identify mismatches</p>
+    <h2>GST Reconciliation (Purchase vs GSTR-2B)</h2>
+    <p>Compare purchase invoices with GST portal data to identify ITC eligibility</p>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-    <div class="tab active">Purchase vs GSTR-2B</div>
-    <div class="tab">Purchase vs GSTR-2A</div>
-    <div class="tab">Sales vs GSTR-1</div>
-</div>
+<!-- SUMMARY COUNTS -->
+{% set matched = rows | selectattr("status", "equalto", "MATCHED") | list | length %}
+{% set mismatch = rows | selectattr("status", "equalto", "MISMATCH") | list | length %}
+{% set missing = rows | selectattr("status", "equalto", "MISSING") | list | length %}
 
-<!-- SUMMARY -->
 <div class="summary-grid">
     <div class="summary-card">
         <h4>Total Invoices</h4>
-        <p>124</p>
+        <p>{{ rows|length }}</p>
     </div>
     <div class="summary-card">
         <h4>Matched</h4>
-        <p style="color:#15803d;">98</p>
+        <p style="color:#15803d;">{{ matched }}</p>
     </div>
     <div class="summary-card">
         <h4>Mismatched</h4>
-        <p style="color:#b91c1c;">16</p>
+        <p style="color:#b91c1c;">{{ mismatch }}</p>
     </div>
     <div class="summary-card">
-        <h4>Missing</h4>
-        <p style="color:#92400e;">10</p>
+        <h4>Missing in GSTR-2B</h4>
+        <p style="color:#92400e;">{{ missing }}</p>
     </div>
 </div>
 
@@ -165,50 +128,45 @@ th {
 <thead>
 <tr>
     <th>Invoice No</th>
-    <th>Supplier / Customer</th>
+    <th>Vendor</th>
     <th>GSTIN</th>
-    <th>Taxable Amount</th>
-    <th>GST Amount</th>
-    <th>Source</th>
+    <th>System Taxable</th>
+    <th>GSTR-2B Taxable</th>
+    <th>System GST</th>
+    <th>GSTR-2B GST</th>
     <th>Status</th>
-    <th>Action</th>
 </tr>
 </thead>
+
 <tbody>
-
+{% for r in rows %}
 <tr>
-    <td>INV-4589</td>
-    <td>ABC Traders</td>
-    <td>27ABCDE1234F1Z5</td>
-    <td>₹10,000</td>
-    <td>₹1,800</td>
-    <td>System + GSTR-2B</td>
-    <td><span class="status matched">MATCHED</span></td>
-    <td><button class="action-btn">View</button></td>
+    <td>{{ r.invoice_no }}</td>
+    <td>{{ r.vendor_name }}</td>
+    <td>{{ r.supplier_gstin }}</td>
+    <td>₹ {{ "%.2f"|format(r.system_taxable or 0) }}</td>
+    <td>₹ {{ "%.2f"|format(r.gstr_taxable or 0) }}</td>
+    <td>₹ {{ "%.2f"|format(r.system_gst or 0) }}</td>
+    <td>₹ {{ "%.2f"|format(r.gstr_gst or 0) }}</td>
+    <td>
+        {% if r.status == "MATCHED" %}
+            <span class="badge matched">MATCHED</span>
+        {% elif r.status == "MISMATCH" %}
+            <span class="badge mismatch">MISMATCH</span>
+        {% else %}
+            <span class="badge missing">MISSING</span>
+        {% endif %}
+    </td>
 </tr>
+{% endfor %}
 
+{% if rows|length == 0 %}
 <tr>
-    <td>INV-4621</td>
-    <td>XYZ Oils</td>
-    <td>27XYZDE9876P1Z9</td>
-    <td>₹12,000</td>
-    <td>₹2,160</td>
-    <td>System</td>
-    <td><span class="status missing">MISSING</span></td>
-    <td><button class="action-btn">Follow-up</button></td>
+    <td colspan="8" class="empty">
+        No purchase invoices available for reconciliation
+    </td>
 </tr>
-
-<tr>
-    <td>INV-4702</td>
-    <td>Fresh Seeds Co.</td>
-    <td>27FRSHD4455L1Z2</td>
-    <td>₹8,500</td>
-    <td>₹1,530</td>
-    <td>Mismatch</td>
-    <td><span class="status mismatch">MISMATCH</span></td>
-    <td><button class="action-btn">Resolve</button></td>
-</tr>
-
+{% endif %}
 </tbody>
 </table>
 </div>

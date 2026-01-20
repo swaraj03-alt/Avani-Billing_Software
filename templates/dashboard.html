@@ -150,72 +150,80 @@
 <!-- HEADER -->
 <div class="dashboard-header">
     <h1>Dashboard</h1>
-    <p>Avani Wood Cold Pressed Oil – Business Snapshot</p>
+    <p>Avani Wood Cold Pressed Oil –Business Snapshot – {{ current_month }}
+</p>
 </div>
 
 <!-- KPI SUMMARY -->
 <div class="kpi-grid">
 
-    <div class="kpi-card">
+        <a href="/reports/today-sales" style="text-decoration:none;color:inherit">
+        <div class="kpi-card">
         <div class="kpi-title">Today’s Sales</div>
-        <div class="kpi-value">₹ {{ today_sales or "0" }}</div>
-        <div class="kpi-sub">{{ today_invoices or 0 }} invoices</div>
-    </div>
+        <div class="kpi-value">₹ {{ today_sales }}</div>
+        <div class="kpi-sub">{{ today_invoices }} invoices</div>
+        </div>
+        </a>
 
-    <div class="kpi-card">
+
+        <a href="/reports/monthly-sales" style="text-decoration:none;color:inherit">
+        <div class="kpi-card">
         <div class="kpi-title">This Month Revenue</div>
-        <div class="kpi-value">₹ {{ monthly_revenue or "0" }}</div>
+        <div class="kpi-value">₹ {{ monthly_revenue }}</div>
         <div class="kpi-sub">{{ current_month }}</div>
-    </div>
+        </div>
+        </a>
 
-    <div class="kpi-card">
+
+        <a href="/credit-notes" style="text-decoration:none;color:inherit">
+        <div class="kpi-card">
         <div class="kpi-title">Outstanding Receivables</div>
-        <div class="kpi-value">₹ {{ outstanding_amount or "0" }}</div>
-        <div class="kpi-sub">{{ pending_customers or 0 }} customers</div>
-    </div>
+        <div class="kpi-value">₹ {{ outstanding_amount }}</div>
+        <div class="kpi-sub">{{ pending_customers }} customers</div>
+        </div>
+        </a>
 
-    <div class="kpi-card">
+        <a href="/gst-summary" style="text-decoration:none;color:inherit">
+        <div class="kpi-card">
         <div class="kpi-title">Estimated GST Liability</div>
-        <div class="kpi-value">₹ {{ gst_liability or "0" }}</div>
+        <div class="kpi-value">₹ {{ gst_liability }}</div>
         <div class="kpi-sub">Auto calculated</div>
-    </div>
+        </div>
+        </a>
 
-    <div class="kpi-card">
-        <div class="kpi-title">Compliance Status</div>
-        <div class="kpi-value status-warning">Action Required</div>
-        <div class="kpi-sub">GSTR-2B pending</div>
-    </div>
+
 
 </div>
 
 <!-- QUICK ACTIONS -->
 <div class="quick-actions">
     <a href="/sale">➕ New Invoice</a>
-    <a href="/payments" class="secondary">💳 Receive Payment</a>
+    <a href="/credit-notes" class="secondary">💳 Receive Payment</a>
     <a href="/eway-bill" class="secondary">🚚 E-Way Bill</a>
     <a href="/customers" class="secondary">👥 Customers</a>
-    <a href="/items" class="secondary">📦 Items</a>
+<!--    <a href="/items" class="secondary">📦 Items</a>-->
 </div>
 
 <!-- MODULES -->
 <div class="cards-grid">
-    <a href="/sale" class="stat-card">
+    <a href="/sales-history" class="stat-card">
         <div class="card-icon bg-sales">💰</div>
         <h3>Sales</h3>
         <p>GST invoices & customer billing</p>
     </a>
 
-    <a href="/purchase" class="stat-card">
+    <a href="/purchase-list" class="stat-card">
         <div class="card-icon bg-purchase">📦</div>
         <h3>Purchase</h3>
         <p>Supplier bills & stock inward</p>
     </a>
 
-    <a href="/production" class="stat-card">
+    <a href="/production-history" class="stat-card">
         <div class="card-icon bg-production">🏭</div>
         <h3>Production</h3>
         <p>Batch & yield tracking</p>
     </a>
+
 
     <a href="/gst-return" class="stat-card">
         <div class="card-icon bg-gst">🏛️</div>
@@ -224,13 +232,56 @@
     </a>
 </div>
 
-<!-- WIDGETS -->
-<div class="widget">
-    📈 Monthly Sales Trend (Chart.js ready)
-</div>
+<!--&lt;!&ndash; WIDGETS &ndash;&gt;-->
+<!--<div class="widget">-->
+<!--    <h3 style="margin-top:0">📈 Monthly Sales Trend</h3>-->
+<!--    <canvas id="monthlySalesChart" height="110"></canvas>-->
+<!--</div>-->
 
-<div class="widget">
-    🧾 GST Liability Breakup (CGST / SGST / IGST)
-</div>
+<!--<div class="widget">-->
+<!--    🧾 GST Liability Breakup (CGST / SGST / IGST)-->
+<!--</div>-->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+fetch("/reports/monthly-sales-data")
+    .then(res => res.json())
+    .then(data => {
+        const ctx = document.getElementById("monthlySalesChart");
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: "Monthly Sales (₹)",
+                    data: data.values,
+                    fill: true,
+                    borderColor: "#16a34a",
+                    backgroundColor: "rgba(22, 163, 74, 0.15)",
+                    tension: 0.35,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => "₹ " + value
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+
+</script>
 
 {% endblock %}

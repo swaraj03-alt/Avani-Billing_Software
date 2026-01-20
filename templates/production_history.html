@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block title %}Production History{% endblock %}
+
+{% block content %}
+<style>
+.production-header {
+    margin-bottom: 20px;
+}
+.production-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1e293b;
+}
+.production-header p {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+.prod-card {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+.prod-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+}
+.prod-table thead {
+    background: #f8fafc;
+}
+.prod-table th {
+    text-align: left;
+    padding: 12px;
+    font-weight: 700;
+    color: #334155;
+    border-bottom: 1px solid #e2e8f0;
+}
+.prod-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
+}
+.prod-table tr:hover {
+    background: #f9fafb;
+}
+.badge {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-block;
+}
+.badge-oil {
+    background: #ecfdf5;
+    color: #047857;
+}
+.badge-container {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+.qty-good {
+    color: #15803d;
+    font-weight: 700;
+}
+.qty-warning {
+    color: #b45309;
+    font-weight: 700;
+}
+@media (max-width: 768px) {
+    .prod-table {
+        font-size: 0.8rem;
+    }
+}
+</style>
+
+<!-- HEADER -->
+<div class="production-header">
+    <h1>🏭 Production History</h1>
+    <p>Overview of oil produced, bottled, and remaining stock</p>
+</div>
+
+<!-- CARD -->
+<div class="prod-card">
+
+<table class="prod-table">
+<thead>
+<tr>
+    <th>Date</th>
+    <th>Oil</th>
+    <th>Batch</th>
+    <th>Container</th>
+    <th>Extracted</th>
+    <th>Bottled</th>
+    <th>Remaining</th>
+</tr>
+</thead>
+
+<tbody>
+{% for r in data %}
+<tr>
+    <td>{{ r.production_date }}</td>
+
+    <td>
+        <span class="badge badge-oil">
+            {{ r.oil_type }}
+        </span>
+    </td>
+
+    <td>{{ r.batch_no }}</td>
+
+    <td>
+        <span class="badge badge-container">
+            {{ r.container_code }}
+        </span>
+    </td>
+
+    <!-- Extracted oil (from batch) -->
+    <td class="qty-good">
+        {{ r.oil_extracted_ltr }} L
+    </td>
+
+    <!-- Bottled quantity (bottles) -->
+    <td>
+        {{ r.bottled_bottles }} bottles
+    </td>
+
+    <!-- Remaining oil (REAL container stock) -->
+    <td class="{% if r.remaining_ltr > 0 %}qty-good{% else %}qty-warning{% endif %}">
+        {{ r.remaining_ltr }} L
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="7" style="text-align:center;color:#94a3b8;padding:20px">
+        No production records found
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+
+</div>
+
+{% endblock %}

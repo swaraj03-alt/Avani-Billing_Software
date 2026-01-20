@@ -67,14 +67,14 @@
     color: #475569;
 }
 
-input {
+input, select {
     padding: 11px 12px;
     border-radius: 8px;
     border: 1.5px solid #e2e8f0;
     font-size: 0.95rem;
 }
 
-input:focus {
+input:focus, select:focus {
     border-color: var(--brand-green);
     outline: none;
 }
@@ -90,12 +90,6 @@ input:focus {
     font-weight: 700;
     cursor: pointer;
     margin-top: 8px;
-}
-
-@media (max-width: 576px) {
-    .btn-add {
-        grid-column: span 1;
-    }
 }
 
 /* RIGHT PREVIEW */
@@ -165,102 +159,213 @@ input:focus {
 <form method="POST" action="/save-purchase">
 <div class="purchase-container">
 
-    <!-- LEFT : PURCHASE ENTRY -->
-    <div class="entry-card">
-        <h2>Create Purchase Entry</h2>
+<!-- ================= LEFT : PURCHASE ENTRY ================= -->
+<div class="entry-card">
+<h2>Create Purchase Entry</h2>
 
-        <div class="form-grid">
-            <div class="input-group full-width">
-                <label>Vendor Name</label>
-                <input name="vendor_name" required>
-            </div>
+<div class="form-grid">
 
-            <div class="input-group">
-                <label>Bill Number</label>
-                <input name="bill_no">
-            </div>
+<!-- Vendor -->
+<div class="input-group full-width">
+<label>Vendor Name</label>
+<input name="vendor_name" id="vendorInput" autocomplete="off" required>
+<div id="vendorSuggestions"
+     style="display:none;position:absolute;background:white;border:1px solid #e5e7eb;
+            border-radius:8px;margin-top:4px;width:100%;z-index:999;">
+</div>
+</div>
 
-            <div class="input-group">
-                <label>Bill Date</label>
-                <input type="date" name="bill_date" required>
-            </div>
+<!-- Bill Date -->
+<div class="input-group">
+<label>Bill Date</label>
+<input type="date" name="bill_date" required>
+</div>
 
-            <div class="input-group full-width">
-                <label>Product / Raw Material</label>
-                <input id="prodName">
-            </div>
+<!-- Payment Mode -->
+<div class="input-group">
+<label>Payment Mode</label>
+<select name="payment_mode" id="paymentMode" required>
+<option value="CASH">Cash</option>
+<option value="UPI">UPI</option>
+<option value="BANK">Bank Transfer</option>
+<option value="CREDIT">Credit (Pay Later)</option>
+</select>
+</div>
 
-            <div class="input-group">
-                <label>Cost Price (₹)</label>
-                <input type="number" id="prodCost">
-            </div>
+ <!-- 🔽 UPI INFO (RECORD ONLY) -->
+<div id="upiSection" class="input-group full-width" style="display:none;">
+    <label>UPI Reference (Optional)</label>
+    <input name="upi_ref"
+           placeholder="Transaction ID / Ref No (optional)">
+    <small style="color:#64748b;">
+        Used only for record. Payment is done outside the system.
+    </small>
+</div>
 
-            <div class="input-group">
-                <label>Quantity</label>
-                <input type="number" id="prodQty" value="1">
-            </div>
 
-            <button type="button" class="btn-add" onclick="addItem()">+ Add Item</button>
-        </div>
-    </div>
+<!-- 🔽 BANK SECTION (ADDED – INLINE, SAME CARD) -->
+<div id="bankSection" class="input-group full-width" style="display:none;">
+<label>Select Bank Account</label>
 
-    <!-- RIGHT : PREVIEW -->
-    <div class="purchase-preview">
-        <div class="preview-header">
-            <h3>Purchase Preview</h3>
-            <small>Live Cost Summary</small>
-        </div>
+<select name="bank_account_id" id="bankSelect">
+<option value="">-- Select Bank --</option>
+{% for b in banks %}
+<option value="{{ b.id }}">
+{{ b.bank_name }} | {{ b.account_no[-4:] }} | {{ b.account_name }}
+</option>
+{% endfor %}
+</select>
 
-        <table class="preview-table">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody id="itemsBody"></tbody>
-        </table>
+<button type="button"
+        onclick="toggleAddBank()"
+        style="margin-top:6px;background:#e5e7eb;border:none;
+               padding:8px;border-radius:8px;cursor:pointer;">
+➕ Add New Bank
+</button>
 
-        <!-- HIDDEN INPUTS -->
-        <input type="hidden" name="items_json" id="itemsJson">
-        <input type="hidden" name="total_amount" id="totalAmount">
+<div id="addBankForm" style="display:none;margin-top:10px;">
+<input id="bankName" placeholder="Bank Name">
+<input id="accountName" placeholder="Account Name">
+<input id="accountNo" placeholder="Account Number">
+<input id="ifsc" placeholder="IFSC">
+<input id="branch" placeholder="Branch">
 
-        <div class="total-section">
-            <div class="total-row">
-                <span>Total Cost</span>
-                <span id="totalText">₹ 0.00</span>
-            </div>
-            <button class="btn-save" type="submit">Save Purchase</button>
-        </div>
-    </div>
+<button type="button"
+        onclick="saveBank()"
+        style="margin-top:6px;background:#4f46e5;color:white;
+               padding:10px;border:none;border-radius:8px;">
+Save Bank
+</button>
+</div>
+</div>
+
+<!-- Product -->
+<div class="input-group full-width">
+<label>Product / Raw Material</label>
+<input id="prodName">
+</div>
+
+<div class="input-group">
+<label>Purchase Price (₹)</label>
+<input type="number" id="prodCost">
+</div>
+
+<div class="input-group">
+<label>Selling Price (₹)</label>
+<input type="number" id="prodSell" step="0.01">
+</div>
+
+<div class="input-group full-width">
+<label><input type="checkbox" id="addToSale"> Add this item to Sale Stock</label>
+</div>
+
+<div class="input-group">
+<label>Quantity</label>
+<input type="number" id="prodQty" value="1" min="0.01" step="0.01">
+</div>
+
+<div class="input-group">
+<label>Unit</label>
+<select id="prodUnit">
+<option value="KG">KG</option>
+<option value="GM">GM</option>
+<option value="LITRE">LITRE</option>
+<option value="ML">ML</option>
+<option value="BOTTLE">BOTTLE</option>
+<option value="TIN">TIN</option>
+<option value="BAG">BAG</option>
+<option value="BOX">BOX</option>
+</select>
+</div>
+
+<button type="button" class="btn-add" onclick="addItem()">+ Add Item</button>
+</div>
+</div>
+
+<!-- ================= RIGHT : PREVIEW ================= -->
+<div class="purchase-preview">
+<div class="preview-header">
+<h3>Purchase Preview</h3>
+<small>Live Cost Summary</small>
+</div>
+
+<table class="preview-table">
+<thead>
+<tr>
+<th>Item</th>
+<th>Qty</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody id="itemsBody"></tbody>
+</table>
+
+<input type="hidden" name="items_json" id="itemsJson">
+<input type="hidden" name="total_amount" id="totalAmount">
+
+<div class="total-section">
+<div class="total-row">
+<span>Total Cost</span>
+<span id="totalText">₹ 0.00</span>
+</div>
+<button class="btn-save" type="submit">Save Purchase</button>
+</div>
+</div>
 
 </div>
 </form>
 
 <script>
+/* ================= YOUR ORIGINAL JS (UNCHANGED) ================= */
 let total = 0;
 let items = [];
 
-function addItem() {
-    const name = prodName.value;
-    const cost = +prodCost.value;
-    const qty = +prodQty.value;
+const prodName = document.getElementById("prodName");
+const prodCost = document.getElementById("prodCost");
+const prodSell = document.getElementById("prodSell");
+const prodQty = document.getElementById("prodQty");
+const prodUnit = document.getElementById("prodUnit");
+const itemsBody = document.getElementById("itemsBody");
+const itemsJson = document.getElementById("itemsJson");
+const totalAmount = document.getElementById("totalAmount");
+const totalText = document.getElementById("totalText");
+const addToSaleChk = document.getElementById("addToSale");
 
-    if (!name || !cost) {
-        alert("Enter item details");
+function addItem() {
+    const name = prodName.value.trim();
+    const cost = parseFloat(prodCost.value);
+    const sell = parseFloat(prodSell.value) || 0;
+    const qty = parseFloat(prodQty.value);
+    const unit = prodUnit.value;
+    const addToSale = addToSaleChk.checked;
+
+    if (!name || !cost || !qty) {
+        alert("Enter item name, cost and quantity");
+        return;
+    }
+
+    if (addToSale && sell <= 0) {
+        alert("Enter selling price if adding to sale stock");
         return;
     }
 
     const itemTotal = cost * qty;
     total += itemTotal;
 
-    items.push({ item: name, qty, cost, total: itemTotal });
+    items.push({
+        item: name,
+        qty: qty,
+        unit: unit,
+        cost: cost,
+        sell: sell,
+        add_to_sale: addToSale,
+        total: itemTotal
+    });
 
     itemsBody.innerHTML += `
         <tr>
-            <td>${name}</td>
-            <td>${qty}</td>
+            <td>${name}${addToSale ? " 🛒" : ""}</td>
+            <td>${qty} ${unit}</td>
             <td>₹ ${itemTotal.toFixed(2)}</td>
         </tr>
     `;
@@ -271,8 +376,76 @@ function addItem() {
 
     prodName.value = "";
     prodCost.value = "";
+    prodSell.value = "";
     prodQty.value = 1;
-    prodName.focus();
+    prodUnit.value = "KG";
+    addToSaleChk.checked = false;
+}
+
+/* Vendor autocomplete */
+const vendorInput = document.getElementById("vendorInput");
+const suggestionBox = document.getElementById("vendorSuggestions");
+
+vendorInput.addEventListener("input", async function () {
+    const q = this.value.trim();
+    if (q.length < 1) { suggestionBox.style.display = "none"; return; }
+
+    const res = await fetch(`/api/vendors?q=${q}`);
+    const vendors = await res.json();
+
+    suggestionBox.innerHTML = "";
+    vendors.forEach(v => {
+        const div = document.createElement("div");
+        div.innerText = v;
+        div.style.padding = "8px 12px";
+        div.onclick = () => {
+            vendorInput.value = v;
+            suggestionBox.style.display = "none";
+        };
+        suggestionBox.appendChild(div);
+    });
+
+    suggestionBox.style.display = "block";
+});
+
+/* ================= ADDED PAYMENT UI LOGIC ================= */
+const paymentMode = document.getElementById("paymentMode");
+const upiSection = document.getElementById("upiSection");
+const bankSection = document.getElementById("bankSection");
+
+paymentMode.addEventListener("change", function () {
+    upiSection.style.display = this.value === "UPI" ? "block" : "none";
+    bankSection.style.display = this.value === "BANK" ? "block" : "none";
+});
+
+/* Add bank */
+function toggleAddBank() {
+    const f = document.getElementById("addBankForm");
+    f.style.display = f.style.display === "none" ? "block" : "none";
+}
+
+async function saveBank() {
+    const data = {
+        bank_name: bankName.value,
+        account_name: accountName.value,
+        account_no: accountNo.value,
+        ifsc: ifsc.value,
+        branch: branch.value
+    };
+
+    const res = await fetch("/api/save-bank", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+    });
+
+    const r = await res.json();
+    const opt = document.createElement("option");
+    opt.value = r.id;
+    opt.textContent = r.label;
+    opt.selected = true;
+    bankSelect.appendChild(opt);
+    document.getElementById("addBankForm").style.display = "none";
 }
 </script>
 

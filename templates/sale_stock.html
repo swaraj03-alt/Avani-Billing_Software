@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sale Stock{% endblock %}
+
+{% block content %}
+<div class="card">
+<h2>🛒 Sale Stock (Ready to Sell)</h2>
+
+<table>
+<thead>
+<tr>
+    <th>Item</th>
+    <th>Qty</th>
+    <th>Cost</th>
+    <th>Selling</th>
+    <th>Profit</th>
+</tr>
+</thead>
+<tbody>
+{% for s in stock %}
+<tr>
+    <td>{{ s.item_name }}</td>
+    <td>{{ s.quantity }} {{ s.unit }}</td>
+    <td>₹ {{ s.cost_price }}</td>
+    <td>₹ {{ s.selling_price }}</td>
+    <td style="color:green;font-weight:bold">
+        ₹ {{ s.selling_price - s.cost_price }}
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+{% endblock %}

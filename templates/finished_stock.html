@@ -1,0 +1,285 @@
+{% extends "base.html" %}
+{% block title %}Finished Stock{% endblock %}
+
+{% block content %}
+<style>
+.rack-container{
+    display:grid;
+    grid-template-columns:1fr 460px;
+    gap:30px;
+}
+@media(max-width:992px){
+    .rack-container{grid-template-columns:1fr;}
+}
+.entry-card,.preview-card{
+    background:#fff;
+    padding:28px;
+    border-radius:16px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+.full{grid-column:span 2;}
+input,select{
+    padding:11px;
+    border-radius:8px;
+    border:1.5px solid #e2e8f0;
+}
+.btn-add,.btn-confirm,.btn-pos{
+    grid-column:span 2;
+    background:#16a34a;
+    color:white;
+    padding:14px;
+    border-radius:10px;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
+}
+.btn-pos{background:#2563eb;}
+.table{
+    width:100%;
+    border-collapse:collapse;
+}
+.table th,.table td{
+    padding:10px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:center;
+    font-size:.85rem;
+}
+.badge{
+    padding:4px 8px;
+    border-radius:999px;
+    font-size:.7rem;
+    font-weight:700;
+}
+.badge-rack{background:#ecfdf5;color:#047857;}
+.badge-manual{background:#eff6ff;color:#1d4ed8;}
+hr{margin:22px 0}
+.table input{
+    width:70px;
+    padding:6px;
+    text-align:center;
+}
+</style>
+
+<div class="rack-container">
+
+<!-- LEFT -->
+<div class="entry-card">
+<h3>📦 Rack Stock → Sale</h3>
+
+<div class="form-grid">
+
+<select id="rackSelect" class="full" onchange="autoFillUnitAndPrice()">
+<option value="">Select Bottled Product</option>
+{% for r in rack %}
+<option
+    data-oil="{{ r.oil_type }}"
+    data-size="{{ r.bottle_size_ml }}"
+    data-qty="{{ r.quantity }}"
+    data-price="{{ r.selling_price or 0 }}"
+>
+    {{ r.oil_type }} ({{ r.bottle_size_ml }} ml) — {{ r.quantity }} bottles
+</option>
+{% endfor %}
+</select>
+
+<input type="number" id="sellQty" min="1" placeholder="Qty">
+<input type="number" step="0.01" id="sellPrice" placeholder="Selling price">
+
+<button class="btn-add" onclick="addRackItem()">➕ Add from Rack</button>
+
+<hr class="full">
+
+<h4 class="full">➕ Manual Sale Item</h4>
+
+<input id="manualName" class="full" placeholder="Product name">
+
+<select id="manualUnit" class="full">
+    <option value="">Select Unit</option>
+    <option value="ML">ML</option>
+    <option value="GRAM">GRAM</option>
+    <option value="PCS">PCS</option>
+    <option value="PCS">KG</option>
+    <option value="PCS">BOX</option>
+    <option value="PCS">BAG</option>
+
+</select>
+
+<input id="manualQty" type="number" min="1" placeholder="Quantity">
+<input id="manualPrice" type="number" step="0.01" placeholder="Selling price">
+
+<button class="btn-add" onclick="addManualItem()">➕ Add Manual Item</button>
+
+</div>
+</div>
+
+<!-- RIGHT -->
+<div class="preview-card">
+<h3 style="text-align:center">🧾 Sale Allocation Preview</h3>
+
+<table class="table">
+<thead>
+<tr>
+    <th>Item</th>
+    <th>Qty</th>
+    <th>Price</th>
+    <th></th>
+</tr>
+</thead>
+<tbody id="previewBody"></tbody>
+</table>
+
+<button class="btn-confirm" onclick="confirmAllocation()">✔ Confirm Allocation</button>
+<button class="btn-pos" onclick="goToPOS()">➡ Send to POS</button>
+</div>
+
+</div>
+
+<script>
+let allocations = [];
+let rackMap = {};
+
+{% for r in rack %}
+rackMap["{{ r.oil_type }}_{{ r.bottle_size_ml }}"] = {{ r.quantity }};
+{% endfor %}
+
+function autoFillUnitAndPrice(){
+    const opt = rackSelect.selectedOptions[0];
+    if(!opt) return;
+    if(opt.dataset.price > 0) sellPrice.value = opt.dataset.price;
+}
+
+function addRackItem(){
+    const opt = rackSelect.selectedOptions[0];
+    if(!opt) return alert("Select rack product");
+
+    const key = opt.dataset.oil + "_" + opt.dataset.size;
+    const available = rackMap[key];
+
+    const qty = parseInt(sellQty.value);
+    const price = parseFloat(sellPrice.value);
+
+    if(!qty || qty <= 0 || qty > available) return alert("Invalid quantity");
+    if(!price || price <= 0) return alert("Invalid price");
+
+    const existing = allocations.find(a =>
+        a.source==="RACK" &&
+        a.oil===opt.dataset.oil &&
+        a.size===opt.dataset.size
+    );
+
+    if(existing){
+        if(existing.quantity + qty > available) return alert("Stock exceeded");
+        existing.quantity += qty;
+    }else{
+        allocations.push({
+            oil: opt.dataset.oil,
+            size: opt.dataset.size,
+            quantity: qty,
+            price: price,
+            source: "RACK"
+        });
+    }
+
+    rackMap[key] -= qty;
+    updateRackText(opt, rackMap[key]);
+    renderPreview();
+}
+
+function addManualItem(){
+    const name = manualName.value.trim();
+    const unit = manualUnit.value;
+    const qty = parseInt(manualQty.value);
+    const price = parseFloat(manualPrice.value);
+
+    if(!name || !unit || !qty || !price) return alert("Fill all fields");
+
+    allocations.push({
+        oil: name,
+        unit: unit,
+        quantity: qty,
+        price: price,
+        source: "MANUAL"
+    });
+
+    renderPreview();
+}
+
+function updateRackText(opt, remaining){
+    opt.textContent = `${opt.dataset.oil} (${opt.dataset.size} ml) — ${remaining} bottles`;
+}
+
+function renderPreview(){
+    previewBody.innerHTML = "";
+    allocations.forEach((a,i)=>{
+        previewBody.innerHTML += `
+        <tr>
+            <td>
+                ${a.oil}
+                <br>
+                <span class="badge ${a.source==="RACK"?"badge-rack":"badge-manual"}">
+                ${a.source==="RACK" ? a.size+" ML" : a.unit}
+                </span>
+            </td>
+            <td>
+                <input type="number" min="1" value="${a.quantity}"
+                    onchange="updateQty(${i},this.value)">
+            </td>
+            <td>
+                <input type="number" step="0.01" value="${a.price}"
+                    onchange="aPrice(${i},this.value)">
+            </td>
+            <td>
+                <button onclick="removeItem(${i})"
+                style="background:#ef4444;color:white;border:none;border-radius:6px">
+                ✕</button>
+            </td>
+        </tr>`;
+    });
+}
+
+function updateQty(i,val){
+    val=parseInt(val);
+    if(val<=0) return;
+    allocations[i].quantity=val;
+    renderPreview();
+}
+
+function aPrice(i,val){
+    val=parseFloat(val);
+    if(val<=0) return;
+    allocations[i].price=val;
+}
+
+function removeItem(i){
+    allocations.splice(i,1);
+    renderPreview();
+}
+
+function confirmAllocation(){
+    fetch("/allocate-rack-stock",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({items:allocations})
+    })
+    .then(r=>r.json())
+    .then(res=>{
+        if(res.status==="success"){
+            alert("Allocation saved");
+        }else{
+            alert(res.msg);
+        }
+    });
+}
+
+function goToPOS(){
+    if(allocations.length===0) return alert("No items");
+    window.location.href="/sale";
+}
+</script>
+
+{% endblock %}

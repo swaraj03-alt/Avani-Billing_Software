@@ -3,272 +3,320 @@
 
 {% block content %}
 <style>
-/* ================= SALE BILLING ================= */
-
 .billing-container {
     display: grid;
     grid-template-columns: 1fr 420px;
     gap: 30px;
-    align-items: start;
 }
 
-/* RESPONSIVE */
 @media (max-width: 992px) {
-    .billing-container {
-        grid-template-columns: 1fr;
-    }
+    .billing-container { grid-template-columns: 1fr; }
 }
 
-/* ENTRY FORM */
-.entry-card {
-    background: white;
+.entry-card, .invoice-preview {
+    background: #fff;
     padding: 28px;
     border-radius: 16px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.08);
 }
 
-.entry-card h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
-    font-size: 1.4rem;
-}
-
 .form-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 18px;
+    gap: 16px;
 }
 
-.full-width {
-    grid-column: span 2;
-}
+.full-width { grid-column: span 2; }
 
-@media (max-width: 576px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-    }
-    .full-width {
-        grid-column: span 1;
-    }
-}
-
-.input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.input-group label {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: #475569;
-}
-
-input {
-    padding: 11px 12px;
-    border: 1.5px solid #e2e8f0;
+input, select {
+    padding: 11px;
     border-radius: 8px;
-    font-size: 0.95rem;
+    border: 1.5px solid #e2e8f0;
+    font-size: .9rem;
 }
-
-input:focus {
-    border-color: var(--brand-green);
-    outline: none;
-}
-
-.btn-add {
-    grid-column: span 2;
-    background: var(--brand-green);
-    color: white;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-@media (max-width: 576px) {
-    .btn-add {
-        grid-column: span 1;
-    }
-}
-
-/* ================= LIVE PREVIEW ================= */
 
 .invoice-preview {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 10px 24px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
-    min-height: 480px;
 }
 
-.invoice-header {
-    padding: 18px;
-    border-bottom: 2px dashed #e2e8f0;
-    text-align: center;
-}
-
-.invoice-header h3 {
-    margin: 0;
-    font-size: 1.1rem;
-}
-
-.invoice-header small {
-    color: #64748b;
-}
-
-/* TABLE */
 .bill-table {
     width: 100%;
     border-collapse: collapse;
+    margin-top: 10px;
 }
 
-.bill-table th {
-    padding: 10px 14px;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #64748b;
-    border-bottom: 1px solid #f1f5f9;
+.bill-table th, .bill-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: .85rem;
+    text-align:center;
 }
 
-.bill-table td {
-    padding: 10px 14px;
-    font-size: 0.9rem;
-    border-bottom: 1px solid #f1f5f9;
+.bill-table input {
+    width:70px;
+    padding:6px;
+    text-align:center;
 }
 
-/* TOTAL */
 .total-section {
     margin-top: auto;
-    padding: 18px;
-    background: #f8fafc;
-    border-radius: 0 0 16px 16px;
+    padding-top: 16px;
+    border-top: 2px dashed #e2e8f0;
 }
 
 .total-row {
     display: flex;
     justify-content: space-between;
     font-weight: 800;
-    font-size: 1.15rem;
 }
 
 .btn-generate {
-    width: 100%;
-    margin-top: 12px;
-    background: #4f46e5;
-    color: white;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
+    margin-top:14px;
+    background:#16a34a;
+    color:white;
+    padding:14px;
+    border-radius:10px;
+    font-weight:700;
+    border:none;
+    cursor:pointer;
 }
 </style>
 
 <div class="billing-container">
 
-    <!-- LEFT : ENTRY -->
-    <div class="entry-card">
-        <h2>Create New Bill</h2>
+<!-- LEFT : CUSTOMER + PRODUCT -->
+<div class="entry-card">
+<h3>Create New Bill</h3>
 
-        <div class="form-grid">
-            <div class="input-group full-width">
-                <label>Customer Name</label>
-                <input type="text" id="custName" placeholder="Search or enter name">
-            </div>
+<div class="form-grid">
+<input class="full-width" id="custName" placeholder="Customer Name">
+<input id="custMobile" placeholder="10 digit mobile" maxlength="10">
+<input class="full-width" id="custAddress" placeholder="Address">
 
-            <div class="input-group full-width">
-                <label>Scan Product / Search Code</label>
-                <input type="text" id="prodName" placeholder="Barcode Scanner Input">
-            </div>
+<select id="productSelect" class="full-width" onchange="onProductSelect()">
+<option value="">➕ Select Product</option>
+{% for s in stock %}
+<option
+    data-name="{{ s.item_name }}"
+    data-unit="{{ s.unit }}"
+    data-stock="{{ s.quantity }}"
+    data-price="{{ s.selling_price }}"
+    data-source="{{ s.source }}"
+    data-size="{{ s.bottle_size_ml }}"
+    {% if s.item_name == pre_oil and s.bottle_size_ml|string == pre_size %}
+        selected
+    {% endif %}
+>
+    {{ s.item_name }} ({{ s.unit }}) — {{ s.quantity }} in stock
+</option>
+{% endfor %}
+</select>
+<hr class="full-width">
 
-            <div class="input-group">
-                <label>Price (₹)</label>
-                <input type="number" id="prodPrice" placeholder="0.00">
-            </div>
+<input id="manualName" placeholder="Custom Item Name" class="full-width">
+<input id="manualQty" type="number" min="1" value="1" placeholder="Qty">
+<input id="manualPrice" type="number" step="0.01" placeholder="Price">
 
-            <div class="input-group">
-                <label>Quantity</label>
-                <input type="number" id="prodQty" value="1">
-            </div>
-
-            <button class="btn-add" onclick="addItem()">+ Add to Bill</button>
-        </div>
-    </div>
-
-    <!-- RIGHT : PREVIEW -->
-    <div class="invoice-preview">
-        <div class="invoice-header">
-            <h3>Avani Wood Pressed Oil</h3>
-            <small>Live Bill Preview</small>
-        </div>
-
-        <table class="bill-table" id="billItems">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Qty</th>
-                    <th>Total</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-
-        <div class="total-section">
-            <div class="total-row">
-                <span>Grand Total</span>
-                <span id="grandTotal">₹ 0.00</span>
-            </div>
-            <button class="btn-generate" onclick="openPaymentModal()">
-                Proceed to Payment
-            </button>
-        </div>
-    </div>
+<button type="button"
+        class="full-width"
+        style="background:#334155;color:white;border:none;padding:12px;border-radius:10px"
+        onclick="addManualItem()">
+    ➕ Add Custom Item
+</button>
 
 </div>
+</div>
 
+<!-- RIGHT : POS PREVIEW -->
+<div class="invoice-preview">
+
+<h3 style="text-align:center;margin-bottom:10px;">🧾 Avani POS</h3>
+
+<table class="bill-table">
+<thead>
+<tr>
+    <th>Item</th>
+    <th>Qty</th>
+    <th>Price</th>
+    <th>Total</th>
+    <th></th>
+</tr>
+</thead>
+<tbody id="billBody"></tbody>
+</table>
+
+<div class="total-section">
+<div class="total-row">
+<span>Grand Total</span>
+<span id="grandTotal">₹ 0.00</span>
+</div>
+<button class="btn-generate" onclick="submitSale()">Proceed to Payment</button>
+</div>
+
+</div>
+</div>
+
+<!-- ================== JS ================== -->
 <script>
-let total = 0;
+let items = [];
 
-function addItem() {
-    const name = prodName.value;
-    const price = parseFloat(prodPrice.value);
-    const qty = parseInt(prodQty.value);
+function onProductSelect(){
+    const opt = productSelect.selectedOptions[0];
+    if(!opt) return;
 
-    if (!name || !price) {
-        alert("Please fill product details");
+    const stock = parseInt(opt.dataset.stock);
+    const price = parseFloat(opt.dataset.price);
+
+    if(stock <= 0){
+        alert("Out of stock");
         return;
     }
 
-    const subtotal = price * qty;
-    total += subtotal;
+    const existing = items.find(i =>
+        i.item_name === opt.dataset.name &&
+        String(i.bottle_size_ml) === String(opt.dataset.size)
+    );
 
-    const row = billItems.querySelector("tbody").insertRow();
-    row.innerHTML = `
-        <td>${name}</td>
-        <td>${qty}</td>
-        <td>₹ ${subtotal.toFixed(2)}</td>
-    `;
+    if(existing){
+        if(existing.quantity + 1 > stock){
+            alert("Stock limit reached");
+            return;
+        }
+        existing.quantity += 1;
+    } else {
+        items.push({
+            item_name: opt.dataset.name,
+            unit: opt.dataset.unit,
+            source: opt.dataset.source,
+            bottle_size_ml: opt.dataset.size,
+            quantity: 1,
+            price: price,
+            max_stock: stock
+        });
+    }
 
-    grandTotal.innerText = `₹ ${total.toFixed(2)}`;
+    opt.dataset.stock = stock - 1;
+    opt.textContent = `${opt.dataset.name} (${opt.dataset.unit}) — ${opt.dataset.stock} in stock`;
+    if(opt.dataset.stock == 0) opt.disabled = true;
 
-    prodName.value = "";
-    prodPrice.value = "";
-    prodQty.value = "1";
-    prodName.focus();
+    render();
 }
 
-function openPaymentModal() {
-    const customer = custName.value;
+function render(){
+    let total = 0;
+    billBody.innerHTML = "";
 
-    if (total <= 0) return alert("Please add at least one product.");
-    if (!customer) return alert("Please enter Customer Name.");
+    items.forEach((i,idx)=>{
+        const rowTotal = i.quantity * i.price;
+        total += rowTotal;
 
-    window.location.href = `/payments?customer=${encodeURIComponent(customer)}&total=${total.toFixed(2)}`;
+        billBody.innerHTML += `
+        <tr>
+            <td>${i.item_name}</td>
+            <td>
+                <input type="number" min="1" max="${i.max_stock}"
+                       value="${i.quantity}"
+                       onchange="updateQty(${idx}, this.value)">
+            </td>
+            <td>
+                <input type="number" step="0.01"
+                       value="${i.price}"
+                       onchange="updatePrice(${idx}, this.value)">
+            </td>
+            <td>₹ ${rowTotal.toFixed(2)}</td>
+            <td>
+                <button onclick="removeItem(${idx})"
+                        style="background:#ef4444;color:white;
+                               border:none;border-radius:6px;padding:4px 8px">
+                    ✕
+                </button>
+            </td>
+        </tr>`;
+    });
+
+    grandTotal.innerText = "₹ " + total.toFixed(2);
 }
+
+function updateQty(i,val){
+    val = parseInt(val);
+    if(val <= 0 || val > items[i].max_stock){
+        alert("Invalid quantity");
+        render();
+        return;
+    }
+    items[i].quantity = val;
+    render();
+}
+
+function updatePrice(i,val){
+    val = parseFloat(val);
+    if(val <= 0){
+        alert("Invalid price");
+        render();
+        return;
+    }
+    items[i].price = val;
+    render();
+}
+
+function removeItem(i){
+    items.splice(i,1);
+    render();
+}
+
+function submitSale(){
+    if(custName.value.trim()=="" || custMobile.value.length!=10){
+        alert("Enter valid customer details");
+        return;
+    }
+    if(items.length==0){
+        alert("No items added");
+        return;
+    }
+
+    f_customer.value = custName.value;
+    f_mobile.value = custMobile.value;
+    f_address.value = custAddress.value;
+    f_items.value = JSON.stringify(items);
+    saleForm.submit();
+}
+
+function addManualItem(){
+    const name = manualName.value.trim();
+    const qty = parseInt(manualQty.value);
+    const price = parseFloat(manualPrice.value);
+
+    if(!name || qty <= 0 || price <= 0){
+        alert("Enter valid item, quantity & price");
+        return;
+    }
+
+    items.push({
+        item_name: name,
+        unit: "NOS",
+        source: "MANUAL",
+        bottle_size_ml: null,
+        quantity: qty,
+        price: price,
+        max_stock: 9999
+    });
+
+    manualName.value = "";
+    manualQty.value = 1;
+    manualPrice.value = "";
+
+    render();
+}
+
+
 </script>
+
+<form id="saleForm" method="POST" action="/save-sale">
+<input type="hidden" name="customer_name" id="f_customer">
+<input type="hidden" name="customer_mobile" id="f_mobile">
+<input type="hidden" name="customer_address" id="f_address">
+<input type="hidden" name="items_json" id="f_items">
+</form>
 
 {% endblock %}

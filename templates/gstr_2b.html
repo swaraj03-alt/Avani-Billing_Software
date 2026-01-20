@@ -3,49 +3,36 @@
 
 {% block content %}
 <style>
-/* ================= GSTR 2B ================= */
+/* ================= GSTR-2B (ERP / CA READY) ================= */
 
 .page-header {
     margin-bottom: 25px;
 }
 
 .page-header h2 {
-    font-size: 1.8rem;
+    font-size: 1.9rem;
     font-weight: 800;
     color: #1e293b;
 }
 
 .page-header p {
     color: #64748b;
-    margin-top: 4px;
+    margin-top: 6px;
+    font-size: 0.95rem;
 }
 
-/* FILTER BAR */
-.filter-bar {
-    background: white;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    padding: 18px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 25px;
-    flex-wrap: wrap;
+/* INFO NOTE */
+.note {
+    background: #f0fdf4;
+    border-left: 4px solid #16a34a;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+    color: #14532d;
 }
 
-.filter-bar label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #475569;
-}
-
-.filter-bar select {
-    padding: 8px 12px;
-    border-radius: 8px;
-    border: 1px solid #cbd5e1;
-}
-
-/* SUMMARY */
+/* SUMMARY GRID */
 .summary-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -61,125 +48,139 @@
 }
 
 .summary-card h4 {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: #64748b;
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .summary-card p {
     font-size: 1.6rem;
     font-weight: 800;
-    margin: 8px 0 0;
+    margin-top: 8px;
 }
 
-/* TABLE */
-.table-wrap {
+/* TABLE CARD */
+.table-card {
     background: white;
-    border-radius: 14px;
+    border-radius: 16px;
     border: 1px solid #e2e8f0;
     overflow: hidden;
 }
 
-table {
+/* TABLE */
+.table {
     width: 100%;
     border-collapse: collapse;
+    font-size: 0.88rem;
 }
 
-thead {
+.table thead {
     background: #f8fafc;
 }
 
-th, td {
+.table th {
     padding: 14px;
-    font-size: 0.9rem;
+    font-weight: 700;
+    color: #334155;
     border-bottom: 1px solid #e2e8f0;
+    text-align: left;
 }
 
-th {
-    font-weight: 700;
-    color: #475569;
+.table td {
+    padding: 14px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #1f2937;
 }
 
-/* ITC STATUS */
+.table tr:hover {
+    background: #f9fafb;
+}
+
+/* ALIGN AMOUNTS */
+.table td:nth-child(5),
+.table td:nth-child(6) {
+    text-align: right;
+}
+
+/* STATUS BADGES */
 .status {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.72rem;
     font-weight: 700;
+    display: inline-block;
 }
 
-.eligible { background: #dcfce7; color: #15803d; }
-.ineligible { background: #fee2e2; color: #b91c1c; }
-.reversed { background: #fef3c7; color: #92400e; }
+.eligible {
+    background: #dcfce7;
+    color: #15803d;
+}
 
-/* NOTE BOX */
-.note-box {
-    background: #f8fafc;
-    border: 1px dashed #cbd5e1;
-    border-radius: 14px;
-    padding: 18px;
-    margin-bottom: 25px;
+.ineligible {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.reversed {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+/* EMPTY */
+.empty {
+    text-align: center;
+    padding: 35px;
+    color: #64748b;
     font-size: 0.9rem;
-    color: #475569;
 }
 </style>
 
 <!-- HEADER -->
 <div class="page-header">
-    <h2>GSTR-2B</h2>
-    <p>Static ITC statement – final input tax credit available for the period</p>
-</div>
-
-<!-- FILTER BAR -->
-<div class="filter-bar">
-    <label>Return Period</label>
-    <select>
-        <option>April 2025</option>
-        <option>March 2025</option>
-        <option>February 2025</option>
-    </select>
-
-    <label>ITC Type</label>
-    <select>
-        <option>All</option>
-        <option>Eligible</option>
-        <option>Ineligible</option>
-        <option>Reversed</option>
-    </select>
+    <h2>📘 GSTR-2B – Input Tax Credit (ITC)</h2>
+    <p>Final ITC available for GSTR-3B filing for the selected return period</p>
 </div>
 
 <!-- NOTE -->
-<div class="note-box">
-    🔒 <strong>Note:</strong> GSTR-2B is a static statement. ITC shown here is final for this tax period and should be used for filing GSTR-3B.
+<div class="note">
+<strong>Important:</strong><br>
+• GSTR-2B is a <b>static statement</b> issued by the GST portal<br>
+• ITC shown here is <b>final for the period</b> and should be used for <b>GSTR-3B filing</b><br>
+• Any missing or ineligible ITC <b>cannot be claimed</b> in this return period
 </div>
 
 <!-- SUMMARY -->
 <div class="summary-grid">
     <div class="summary-card">
         <h4>Total Invoices</h4>
-        <p>88</p>
+        <p>{{ summary.total_invoices }}</p>
     </div>
+
     <div class="summary-card">
         <h4>Eligible ITC</h4>
-        <p>₹ 52,600</p>
+        <p style="color:#15803d">₹ {{ "%.2f"|format(summary.eligible_itc) }}</p>
     </div>
+
     <div class="summary-card">
         <h4>Ineligible ITC</h4>
-        <p>₹ 6,480</p>
+        <p style="color:#b91c1c">₹ {{ "%.2f"|format(summary.ineligible_itc) }}</p>
     </div>
+
     <div class="summary-card">
         <h4>Reversed ITC</h4>
-        <p>₹ 1,760</p>
+        <p style="color:#92400e">₹ {{ "%.2f"|format(summary.reversed_itc) }}</p>
     </div>
 </div>
 
 <!-- TABLE -->
-<div class="table-wrap">
-<table>
+<div class="table-card">
+<table class="table">
 <thead>
 <tr>
     <th>Invoice No</th>
-    <th>Invoice Date</th>
+    <th>Date</th>
     <th>Supplier</th>
     <th>GSTIN</th>
     <th>Taxable</th>
@@ -187,38 +188,32 @@ th {
     <th>ITC Status</th>
 </tr>
 </thead>
+
 <tbody>
-
+{% for i in invoices %}
 <tr>
-    <td>INV-4589</td>
-    <td>05-Apr-2025</td>
-    <td>ABC Traders</td>
-    <td>27ABCDE1234F1Z5</td>
-    <td>₹10,000</td>
-    <td>₹1,800</td>
-    <td><span class="status eligible">ELIGIBLE</span></td>
-</tr>
+    <td>{{ i.invoice_no }}</td>
+    <td>{{ i.invoice_date }}</td>
+    <td>{{ i.supplier_name }}</td>
+    <td>{{ i.supplier_gstin }}</td>
+    <td>₹ {{ "%.2f"|format(i.taxable) }}</td>
+    <td>₹ {{ "%.2f"|format(i.gst) }}</td>
 
+    {% if i.itc_status == "ELIGIBLE" %}
+        <td><span class="status eligible">ELIGIBLE</span></td>
+    {% elif i.itc_status == "INELIGIBLE" %}
+        <td><span class="status ineligible">INELIGIBLE</span></td>
+    {% else %}
+        <td><span class="status reversed">REVERSED</span></td>
+    {% endif %}
+</tr>
+{% else %}
 <tr>
-    <td>INV-4621</td>
-    <td>12-Apr-2025</td>
-    <td>XYZ Oils</td>
-    <td>27XYZDE9876P1Z9</td>
-    <td>₹12,000</td>
-    <td>₹2,160</td>
-    <td><span class="status ineligible">INELIGIBLE</span></td>
+    <td colspan="7" class="empty">
+        No GSTR-2B data available for this return period
+    </td>
 </tr>
-
-<tr>
-    <td>INV-4702</td>
-    <td>18-Apr-2025</td>
-    <td>Fresh Seeds Co.</td>
-    <td>27FRSHD4455L1Z2</td>
-    <td>₹8,500</td>
-    <td>₹1,530</td>
-    <td><span class="status reversed">REVERSED</span></td>
-</tr>
-
+{% endfor %}
 </tbody>
 </table>
 </div>

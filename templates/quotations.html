@@ -2,66 +2,225 @@
 {% block title %}Quotation{% endblock %}
 
 {% block content %}
+<style>
+/* ================= QUOTATION UI ================= */
 
-<!-- PRINT AREA START -->
-<div class="quotation-box print-area">
+.print-area {
+    max-width: 900px;
+    margin: auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    font-size: 0.9rem;
+}
+
+/* HEADER */
+.q-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.company {
+    display: flex;
+    gap: 15px;
+}
+
+.company img {
+    width: 80px;
+}
+
+.company h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.company p {
+    margin: 2px 0;
+    color: #475569;
+}
+
+.q-title {
+    text-align: right;
+}
+
+.q-title h1 {
+    margin: 0;
+    color: #1e293b;
+}
+
+.q-title p {
+    margin: 3px 0;
+}
+
+/* ADDRESS */
+.q-address {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.q-address h4 {
+    margin-bottom: 8px;
+}
+
+.q-address input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 6px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+/* TABLE */
+.q-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.q-table th {
+    background: #f1f5f9;
+    padding: 10px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.q-table td {
+    padding: 8px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.q-table input {
+    width: 100%;
+    border: none;
+    outline: none;
+}
+
+/* BUTTONS */
+.add-btn {
+    margin-top: 10px;
+    padding: 8px 14px;
+    background: #16a34a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* TOTALS */
+.q-totals {
+    margin-top: 20px;
+    width: 320px;
+    margin-left: auto;
+}
+
+.q-totals table {
+    width: 100%;
+}
+
+.q-totals td {
+    padding: 6px;
+}
+
+.q-totals .grand {
+    font-weight: 800;
+    font-size: 1.05rem;
+}
+
+/* SIGNATURE */
+.q-sign {
+    margin-top: 40px;
+    text-align: right;
+}
+
+/* ACTIONS */
+.q-actions {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.q-actions button {
+    padding: 10px 16px;
+    margin: 6px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.q-actions .convert { background: #4f46e5; color: white; }
+.q-actions .whatsapp { background: #22c55e; color: white; }
+
+/* PRINT */
+@media print {
+    .no-print { display: none; }
+    body { background: white; }
+}
+</style>
+
+<!-- ================= QUOTATION ================= -->
+
+<div class="print-area">
 
     <!-- HEADER -->
     <div class="q-header">
         <div class="company">
-            <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="logo">
+            <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}">
             <div>
                 <h2>Avani Wood Cold Pressed Oil</h2>
                 <p>Amravati, Maharashtra</p>
                 <p>GSTIN: 27XXXXXXXXXX</p>
-                <p>Phone: +91-XXXXXXXXXX</p>
+                <p>📞 +91-XXXXXXXXXX</p>
             </div>
         </div>
 
         <div class="q-title">
             <h1>QUOTATION</h1>
-            <p><b>Quotation No:</b> QTN-001</p>
+            <p><b>No:</b> QTN-001</p>
             <p><b>Date:</b> <input type="date"></p>
-            <p><b>Valid Until:</b> <input type="date"></p>
+            <p><b>Valid Till:</b> <input type="date"></p>
         </div>
     </div>
 
     <hr>
 
-    <!-- CUSTOMER DETAILS -->
+    <!-- CUSTOMER -->
     <div class="q-address">
         <div>
             <h4>Quote To</h4>
             <input id="customerName" placeholder="Customer Name">
             <input placeholder="Address">
-            <input placeholder="GSTIN">
+            <input placeholder="GSTIN (Optional)">
         </div>
         <div>
             <h4>Ship To</h4>
             <input placeholder="Shipping Address">
-            <p>Place of Supply: MH (27)</p>
+            <p>Place of Supply: Maharashtra (27)</p>
         </div>
     </div>
 
-    <!-- ITEM TABLE -->
+    <!-- ITEMS -->
     <table class="q-table" id="itemsTable">
         <thead>
             <tr>
-                <th>S.No</th>
+                <th>#</th>
                 <th>Description</th>
                 <th>HSN</th>
                 <th>Qty</th>
-                <th>Price ₹</th>
+                <th>Rate ₹</th>
                 <th>Taxable ₹</th>
                 <th>CGST 9%</th>
                 <th>SGST 9%</th>
-                <th>Amount ₹</th>
+                <th>Total ₹</th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>1</td>
-                <td><input value="Groundnut Oil 1L"></td>
+                <td><input value="Groundnut Oil 1 Ltr"></td>
                 <td><input value="1515"></td>
                 <td><input type="number" value="1" oninput="calculate()"></td>
                 <td><input type="number" value="500" oninput="calculate()"></td>
@@ -73,52 +232,49 @@
         </tbody>
     </table>
 
-    <!-- ADD PRODUCT -->
-    <button class="add-btn no-print" onclick="addRow()">+ Add Product</button>
+    <button class="add-btn no-print" onclick="addRow()">+ Add Item</button>
 
     <!-- TOTALS -->
     <div class="q-totals">
         <table>
             <tr>
-                <td>Total Taxable Value</td>
+                <td>Taxable Value</td>
                 <td>₹ <span id="taxable_total">500.00</span></td>
             </tr>
             <tr>
-                <td>Total Tax Amount</td>
+                <td>Total GST</td>
                 <td>₹ <span id="tax_total">90.00</span></td>
             </tr>
             <tr class="grand">
-                <td>Total Value</td>
+                <td>Grand Total</td>
                 <td>₹ <span id="grand_total">590.00</span></td>
             </tr>
         </table>
     </div>
 
-    <!-- SIGNATURE -->
+    <!-- SIGN -->
     <div class="q-sign">
-        <p>For Avani Wood Cold Pressed Oil</p><br><br>
-        <p><b>Authorized Signatory</b></p>
+        <p>For Avani Wood Cold Pressed Oil</p><br>
+        <b>Authorized Signatory</b>
     </div>
 
 </div>
-<!-- PRINT AREA END -->
 
-<!-- ACTION BUTTONS -->
+<!-- ACTIONS -->
 <div class="q-actions no-print">
-    <button onclick="window.print()">Print Quotation</button>
+    <button onclick="window.print()">🖨 Print</button>
     <button class="convert">Convert to Invoice</button>
-    <button class="whatsapp" onclick="shareWhatsApp()">Share on WhatsApp</button>
+    <button class="whatsapp" onclick="shareWhatsApp()">WhatsApp</button>
 </div>
 
-<!-- JAVASCRIPT -->
 <script>
 function addRow() {
     const tbody = document.querySelector("#itemsTable tbody");
-    const rowCount = tbody.rows.length + 1;
+    const i = tbody.rows.length + 1;
 
     const row = tbody.insertRow();
     row.innerHTML = `
-        <td>${rowCount}</td>
+        <td>${i}</td>
         <td><input></td>
         <td><input></td>
         <td><input type="number" value="1" oninput="calculate()"></td>
@@ -131,50 +287,38 @@ function addRow() {
 }
 
 function calculate() {
-    const rows = document.querySelectorAll("#itemsTable tbody tr");
-    let totalTaxable = 0, totalTax = 0, grandTotal = 0;
+    let taxable = 0, tax = 0, total = 0;
 
-    rows.forEach(row => {
-        const qty = Number(row.cells[3].querySelector("input").value) || 0;
-        const price = Number(row.cells[4].querySelector("input").value) || 0;
+    document.querySelectorAll("#itemsTable tbody tr").forEach(row => {
+        const qty = +row.cells[3].querySelector("input").value || 0;
+        const rate = +row.cells[4].querySelector("input").value || 0;
 
-        const taxable = qty * price;
-        const cgst = taxable * 0.09;
-        const sgst = taxable * 0.09;
-        const amount = taxable + cgst + sgst;
+        const t = qty * rate;
+        const cgst = t * 0.09;
+        const sgst = t * 0.09;
+        const amt = t + cgst + sgst;
 
-        row.querySelector(".taxable").innerText = taxable.toFixed(2);
+        row.querySelector(".taxable").innerText = t.toFixed(2);
         row.querySelector(".cgst").innerText = cgst.toFixed(2);
         row.querySelector(".sgst").innerText = sgst.toFixed(2);
-        row.querySelector(".amount").innerText = amount.toFixed(2);
+        row.querySelector(".amount").innerText = amt.toFixed(2);
 
-        totalTaxable += taxable;
-        totalTax += cgst + sgst;
-        grandTotal += amount;
+        taxable += t;
+        tax += cgst + sgst;
+        total += amt;
     });
 
-    document.getElementById("taxable_total").innerText = totalTaxable.toFixed(2);
-    document.getElementById("tax_total").innerText = totalTax.toFixed(2);
-    document.getElementById("grand_total").innerText = grandTotal.toFixed(2);
+    taxable_total.innerText = taxable.toFixed(2);
+    tax_total.innerText = tax.toFixed(2);
+    grand_total.innerText = total.toFixed(2);
 }
 
 function shareWhatsApp() {
-    const customer = document.getElementById("customerName").value || "Customer";
-    const total = document.getElementById("grand_total").innerText;
+    const name = customerName.value || "Customer";
+    const total = grand_total.innerText;
 
-    const message =
-`Quotation from Avani Wood Cold Pressed Oil
-
-Customer: ${customer}
-Total Amount: ₹${total}
-
-Thank you.`;
-
-    const phone = "91XXXXXXXXXX";  // replace later
-    window.open(
-        "https://wa.me/" + phone + "?text=" + encodeURIComponent(message),
-        "_blank"
-    );
+    const msg = `Quotation from Avani Wood Cold Pressed Oil\nCustomer: ${name}\nTotal: ₹${total}`;
+    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank");
 }
 </script>
 

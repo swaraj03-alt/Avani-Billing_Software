@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Credit Notes{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.table th, .table td {
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    text-align: center;
+}
+
+.table th {
+    background: #fef3c7;
+    font-weight: 700;
+}
+
+.badge-due {
+    background: #fde68a;
+    color: #92400e;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.view-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.settle-btn {
+    background: #16a34a;
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #92400e;
+    font-weight: 600;
+}
+</style>
+
+<div class="card">
+    <h2>Credit Notes</h2>
+    <p style="color:#92400e;margin-top:4px">
+        Outstanding customer dues
+    </p>
+
+    {% if credits and credits|length > 0 %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Receipt No</th>
+                <th>Date</th>
+                <th>Customer</th>
+                <th>Amount (₹)</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for c in credits %}
+            <tr>
+                <td>{{ c.receipt_no }}</td>
+                <td>{{ c.created_at.strftime("%d-%m-%Y") }}</td>
+                <td>{{ c.customer_name }}</td>
+                <td>{{ "%.2f"|format(c.amount) }}</td>
+                <td>
+                    <span class="badge-due">DUE</span>
+                </td>
+                <td>
+                    <a href="/receipt/{{ c.id }}">
+                        <button class="view-btn">View</button>
+                    </a>
+                    <a href="/settle-credit-notes?rid={{ c.id }}">
+                        <button class="settle-btn">Settle</button>
+                    </a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <div class="empty">
+            No credit notes found 🎉
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

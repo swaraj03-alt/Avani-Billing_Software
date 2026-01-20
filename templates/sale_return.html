@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Sale Return{% endblock %}
+
+{% block content %}
+<style>
+.card {
+    background:white;
+    padding:28px;
+    border-radius:16px;
+    max-width:750px;
+    margin:auto;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+.grid {
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+}
+.full { grid-column:span 2; }
+label { font-weight:600; font-size:0.85rem; }
+input, select {
+    padding:12px;
+    border-radius:8px;
+    border:1.5px solid #e2e8f0;
+}
+button {
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:14px;
+    border-radius:10px;
+    font-weight:700;
+    width:100%;
+}
+</style>
+
+<div class="card">
+<h2>🔁 Sale Return</h2>
+
+<form method="POST" action="/save-sale-return">
+<div class="grid">
+
+<div>
+<label>Sale ID</label>
+<input name="sale_id" required>
+</div>
+
+<div>
+<label>Oil Type</label>
+<input name="oil_type" required>
+</div>
+
+<div>
+<label>Bottle Size (ml)</label>
+<input name="bottle_size_ml" required>
+</div>
+
+<div>
+<label>Return Quantity</label>
+<input name="quantity" type="number" required>
+</div>
+
+<div class="full">
+<label>Return Reason</label>
+<input name="reason" placeholder="Leakage / Wrong item / Cancelled">
+</div>
+
+<div class="full">
+<button>Process Return</button>
+</div>
+
+</div>
+</form>
+</div>
+
+{% endblock %}

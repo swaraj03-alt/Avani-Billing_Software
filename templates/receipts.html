@@ -14,19 +14,29 @@ body {
 }
 
 .invoice {
-    max-width: 850px;
+    max-width: 900px;
     margin: auto;
     background: white;
     padding: 30px;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 10px 25px rgba(0,0,0,0.08);
 }
 
+/* ===== HEADER ===== */
 .header {
     display: flex;
     justify-content: space-between;
     border-bottom: 2px solid #e5e7eb;
     padding-bottom: 15px;
+}
+
+.company {
+    display: flex;
+    gap: 15px;
+}
+
+.logo {
+    width: 90px;
 }
 
 .company h2 {
@@ -36,31 +46,39 @@ body {
 
 .company small {
     color: #475569;
+    font-size: 0.9rem;
 }
 
-.invoice-details {
+.invoice-meta {
     text-align: right;
     font-size: 0.9rem;
 }
 
+/* ===== CUSTOMER ===== */
 .section {
     margin-top: 25px;
 }
 
+/* ===== TABLE ===== */
 .table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 10px;
+    margin-top: 15px;
 }
 
-.table th, .table td {
+.table th,
+.table td {
     border: 1px solid #e5e7eb;
     padding: 10px;
-    text-align: right;
 }
 
 .table th {
     background: #f1f5f9;
+    text-align: right;
+}
+
+.table td {
+    text-align: right;
 }
 
 .table td:first-child,
@@ -68,9 +86,10 @@ body {
     text-align: left;
 }
 
+/* ===== TOTALS ===== */
 .totals {
+    margin-top: 20px;
     width: 100%;
-    margin-top: 15px;
 }
 
 .totals td {
@@ -83,25 +102,32 @@ body {
     font-weight: 700;
 }
 
-.footer {
-    margin-top: 30px;
+/* ===== ACTION BUTTONS ===== */
+.actions {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 12px;
+    margin-top: 25px;
+    flex-wrap: wrap;
 }
 
-.print-btn {
-    background: #2e7d32;
-    color: white;
-    border: none;
-    padding: 12px 20px;
+.btn {
+    padding: 12px 18px;
     border-radius: 8px;
     font-weight: 600;
+    text-decoration: none;
+    border: none;
     cursor: pointer;
+    color: white;
 }
 
+.btn-print { background: #2e7d32; }
+.btn-home { background: #475569; }
+.btn-sale { background: #2563eb; }
+.btn-wa { background: #25D366; }
+
+/* ===== PRINT ===== */
 @media print {
-    .print-btn { display: none; }
+    .actions { display: none; }
     body { background: white; padding: 0; }
 }
 </style>
@@ -111,77 +137,112 @@ body {
 
 <div class="invoice">
 
-<!-- HEADER -->
+<!-- ===== HEADER ===== -->
 <div class="header">
     <div class="company">
-        <h2>Avani Wood Cold Pressed Oil</h2>
-        <small>
-            GSTIN: 27DARPM3874G1Z3<br>
-            Amravati, Maharashtra
-        </small>
+        <img src="{{ url_for('static', filename='images/avani-logo.jpg') }}" class="logo">
+
+        <div>
+            <h2>Avani Wood Cold Pressed Oil & Natural Store (अवनी लाकडी घाणा आणि नैसर्गिक स्टोअर)</h2>
+            <small>
+                Avani Heritage, Nawathe Chowk,<br>
+                Amravati, Maharashtra<br>
+                Phone: 86691069868
+            </small>
+        </div>
     </div>
 
-    <div class="invoice-details">
+    <div class="invoice-meta">
         <strong>GST Invoice</strong><br>
-        Invoice No: INV-{{ "%04d"|format(range(1)|random) }}<br>
+        Receipt No: {{ receipt_no }}<br>
         Date: {{ datetime.utcnow().strftime("%d-%m-%Y") }}
     </div>
 </div>
 
-<!-- CUSTOMER -->
+<!-- ===== CUSTOMER ===== -->
 <div class="section">
     <strong>Billed To:</strong><br>
     {{ customer }}<br>
     Maharashtra
 </div>
 
-<!-- ITEMS -->
+<!-- ===== ITEMS ===== -->
 <table class="table">
 <thead>
 <tr>
     <th>Description</th>
-    <th>Taxable</th>
-    <th>GST</th>
-    <th>Total</th>
+     <th>Taxable</th>
+     <th>Total</th>
 </tr>
 </thead>
 <tbody>
+{% for i in items %}
 <tr>
-    <td>Edible Oil Purchase</td>
-    <td>₹ {{ taxable }}</td>
-    <td>₹ {{ cgst + sgst }}</td>
-    <td>₹ {{ amount }}</td>
+    <td>
+            {{ i.name }}
+        <br><small>Qty: {{ i.quantity }}</small>
+    </td>
+
+
+    <td>₹ {{ "%.2f"|format(i.taxable) }}</td>
+     <td>₹ {{ "%.2f"|format(i.total) }}</td>
 </tr>
+{% endfor %}
 </tbody>
+
 </table>
 
-<!-- TOTALS -->
+<!-- ===== TOTALS ===== -->
 <table class="totals">
 <tr>
     <td>Taxable Amount</td>
-    <td>₹ {{ taxable }}</td>
+    <td>₹ {{ "%.2f"|format(taxable) }}</td>
 </tr>
 <tr>
     <td>CGST (2.5%)</td>
-    <td>₹ {{ cgst }}</td>
+    <td>₹ {{ "%.2f"|format(cgst) }}</td>
 </tr>
 <tr>
     <td>SGST (2.5%)</td>
-    <td>₹ {{ sgst }}</td>
+    <td>₹ {{ "%.2f"|format(sgst) }}</td>
 </tr>
 <tr>
     <td>Grand Total</td>
-    <td>₹ {{ amount }}</td>
+    <td>₹ {{ "%.2f"|format(amount) }}</td>
 </tr>
 </table>
 
-<!-- FOOTER -->
-<div class="footer">
-    <div>
-        <strong>Payment Mode:</strong> {{ mode }}<br>
-        <small>This is a system generated invoice</small>
-    </div>
-    <button class="print-btn" onclick="window.print()">🖨 Print Invoice</button>
+<!-- ===== FOOTER ===== -->
+<div class="section">
+    <strong>Payment Mode:</strong> {{ mode }}<br>
+    <small>This is a system generated invoice</small>
+</div>
+
+<!-- ===== ACTIONS ===== -->
+<div class="actions">
+
+    <button class="btn btn-print" onclick="window.print()">🖨 Print</button>
+
+    <a href="/dashboard" class="btn btn-home">🏠 Home</a>
+
+    <a href="/sale" class="btn btn-sale">➕ New Sale</a>
+
+    {% set wa_text =
+    "Hello " ~ customer ~
+    "%0A%0AThank you for shopping at Avani Wood Cold Pressed Oil." ~
+    "%0A%0AReceipt No: " ~ receipt_no ~
+    "%0AAmount: ₹" ~ "%.2f"|format(amount) ~
+    "%0A%0AVisit again 🙏"
+    %}
+
+    <a
+    href="https://wa.me/91{{ mobile }}?text={{ wa_text }}"
+    target="_blank"
+    class="btn btn-wa">
+    📲 WhatsApp
+    </a>
+
+
 </div>
 
 </div>
