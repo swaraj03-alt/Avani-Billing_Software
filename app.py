@@ -7,8 +7,6 @@ import random
 import json
 from decimal import Decimal
 import MySQLdb
-
-
 from flask_mysqldb import MySQL #main work for connection of db
 
 app = Flask(__name__)
